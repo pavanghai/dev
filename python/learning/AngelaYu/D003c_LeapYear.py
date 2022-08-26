@@ -3,6 +3,7 @@ year = int(input("Which year do you want to check? "))
 # 🚨 Don't change the code above 👆
 
 #Write your code below this line 👇
+# Flow Chart: https://bit.ly/36BjS2D
 if year % 4 == 0:
     if year % 100 == 0:
         if year % 400 == 0:
