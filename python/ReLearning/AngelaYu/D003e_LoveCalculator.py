@@ -5,17 +5,17 @@ name2 = input("What is their name? \n")
 # 🚨 Don't change the code above 👆
 
 #Write your code below this line 👇
-NAMES = name1.casefold()+name2.casefold()
+names = name1.casefold()+name2.casefold()
 TRUE, LOVE = "true", "love"
 true_total, love_total = 0, 0
   
 for t in TRUE:
     # print(f"{t} occures {NAMES.count(t)} time")
-    true_total += NAMES.count(t)
+    true_total += names.count(t)
 # print()
 for l in LOVE:
     # print(f"{l} occures {NAMES.count(l)} time")
-    love_total += NAMES.count(l)
+    love_total += names.count(l)
 
 score = int(str(true_total) + str(love_total))
 # print(score)
