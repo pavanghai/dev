@@ -3,3 +3,6 @@ Ascii ART:
   https://www.asciiart.eu/
   https://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20
   https://asciiart.website/index.php?art=religion/judaism
+
+Flow charts:
+  D007a_Hangman: https://drive.google.com/file/d/1jD5Gw6nSx-dpMhHhUHqsWOkHzOOT7iGG/view?usp=sharing
