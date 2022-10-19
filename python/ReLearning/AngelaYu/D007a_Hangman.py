@@ -11,7 +11,7 @@ display_word = list('_' * len(word))
 life_count = len(stages) - 1
 
 wrong_guess = []
-game_over, lost_life = False # Created switch
+game_over = lost_life = False # Created switch
 
 print(logo)
 while not game_over:
