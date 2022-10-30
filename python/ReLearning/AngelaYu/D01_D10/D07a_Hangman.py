@@ -2,8 +2,8 @@ from os import system, name
 from random import choice
 from time import sleep
 
-from D007a_Hangman_art import stages, logo
-from D007a_Hangman_word import word_list
+from D07a_Hangman_art import stages, logo
+from D07a_Hangman_word import word_list
 
 
 word = choice(word_list).upper()

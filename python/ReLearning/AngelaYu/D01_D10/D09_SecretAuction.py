@@ -1,5 +1,5 @@
 from os import system, name
-from D009_SecretAuctionArt import logo
+from D09_SecretAuctionArt import logo
 # Create Flow Chart: https://drive.google.com/file/d/1IFySBzf2dIjNkdg61KWaIXHRb-L0Oaux/view?usp=sharing
 
 print(logo)
