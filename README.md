@@ -1,4 +1,10 @@
-# What is this?
+# This is all time pass, will work on this later 
+# Tips and Trick
+## clear screen 
+    from os import system, name
+command for clearing screen
+
+    system('cls' if name in ('nt', 'dos') else 'clear')
 
 The github.dev web-based editor is a lightweight editing experience that runs entirely in your browser. You can navigate files and source code repositories from GitHub, and make and commit code changes.
 
