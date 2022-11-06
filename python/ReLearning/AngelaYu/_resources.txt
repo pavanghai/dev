@@ -5,5 +5,10 @@ Ascii ART:
   https://asciiart.website/index.php?art=religion/judaism
 
 Flow charts:
-  D007a_Hangman: https://drive.google.com/file/d/1jD5Gw6nSx-dpMhHhUHqsWOkHzOOT7iGG/view?usp=sharing
-  D009_secretAuction: https://drive.google.com/file/d/1IFySBzf2dIjNkdg61KWaIXHRb-L0Oaux/view?usp=sharing
+  D07a_Hangman: https://drive.google.com/file/d/1jD5Gw6nSx-dpMhHhUHqsWOkHzOOT7iGG/view?usp=sharing
+  D09_secretAuction: https://drive.google.com/file/d/1IFySBzf2dIjNkdg61KWaIXHRb-L0Oaux/view?usp=sharing
+  D11_BlackJack: https://drive.google.com/file/d/1DnrJNnPd48bnMGEGAsebW9fARn8UiOE1/view?usp=sharing
+
+Tools:
+  online list building tool: https://listmoz.com/
+  
