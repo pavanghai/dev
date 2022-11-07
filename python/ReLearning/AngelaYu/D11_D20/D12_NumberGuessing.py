@@ -35,3 +35,5 @@ while game_continue and guess_attempt > 0:
         guess_attempt -= 1
 
 print("Game over")
+
+# TODO: refacor code to make it as functions (use def) use global variable Global Constant 

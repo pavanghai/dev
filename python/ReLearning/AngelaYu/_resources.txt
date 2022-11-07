@@ -11,4 +11,5 @@ Flow charts:
 
 Tools:
   online list building tool: https://listmoz.com/
+  online code execution to visualize: https://pythontutor.com/visualize.html#mode=edit
   
