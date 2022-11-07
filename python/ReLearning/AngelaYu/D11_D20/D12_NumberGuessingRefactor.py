@@ -36,19 +36,18 @@ def game():
     answer = randint(1, 100)
     print(f"Guessed number: {answer}")
     turns = set_difficulty_level()
-    game_continue = True
     
-    while game_continue and turns > 0:
+    guess = 0
+    while guess != answer:
         print(f"You have {turns} attempts remaining to guess the number")
         guess = int(input("Make a guess: "))
         turns = check_answer(answer, guess, turns)
         
-        if guess == answer:
-            game_continue = False
-        elif turns > 0:
-            print("Guess again.")
-        else:
+        if turns == 0:
             print("You've run out of guesses, you lose. ")
+            return
+        elif guess != answer:
+            print("Guess again.")          
 
     print("Game over")
 
