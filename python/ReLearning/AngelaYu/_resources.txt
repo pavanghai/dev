@@ -13,3 +13,10 @@ Tools:
   online list building tool: https://listmoz.com/
   online code execution to visualize: https://pythontutor.com/visualize.html#mode=edit
   
+PyCharm Features:
+  - Spell Check: hover over squiggly likes to correct it from the suggestions 
+  - More space: see multiple codes --> split screen --> right click on file name and select split and move right for side by side
+  - Built-in Linter: hover over the squiggly lines to see suggested changes as per pep 8 styleGuide --> https://peps.python.org/pep-0008/
+  - Local History: Last 12 Hours history  -->>  ToolBar --> VCS --> Local History --> Show History
+  - View Structure: Structure Pane -->> breaks code into variables and function for easy access
+  - Refactor Rename: Rename variable or function  all at once -->> RightClick on it and select Refactor --> Rename (make required changes) --> Do Refactor
