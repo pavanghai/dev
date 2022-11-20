@@ -12,6 +12,12 @@ Flow charts:
 Tools:
   online list building tool: https://listmoz.com/
   online code execution to visualize: https://pythontutor.com/visualize.html#mode=edit
+  Emoji's : https://emojipedia.org/hot-beverage/
+  
+Keyboard Shortcuts:
+  PyCharm: https://www.jetbrains.com/help/pycharm/mastering-keyboard-shortcuts.html
+  Windows: https://support.microsoft.com/en-gb/windows/windows-keyboard-tips-and-tricks-588e0b72-0fff-6d3f-aeee-6e5116097942
+  Mac: https://support.apple.com/en-gb/guide/mac-help/mchlp1560/mac
   
 PyCharm Features:
   - Spell Check: hover over squiggly likes to correct it from the suggestions 
@@ -20,3 +26,9 @@ PyCharm Features:
   - Local History: Last 12 Hours history  -->>  ToolBar --> VCS --> Local History --> Show History
   - View Structure: Structure Pane -->> breaks code into variables and function for easy access
   - Refactor Rename: Rename variable or function  all at once -->> RightClick on it and select Refactor --> Rename (make required changes) --> Do Refactor
+  - TODO: tracking of todo tasks
+
+ PyCharm Tips:
+  To switch between opened files and tool windows, use the Switcher Ctrl+Tab.
+  For navigation, press and hold Ctrl and use the Up and Down arrow keys or Tab and Shift+Tab, and Alt.
+  Press Delete or BackSpace to close an editor tab or hide a tool window
