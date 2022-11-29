@@ -13,7 +13,13 @@ Tools:
   online list building tool: https://listmoz.com/
   online code execution to visualize: https://pythontutor.com/visualize.html#mode=edit
   Emoji's : https://emojipedia.org/hot-beverage/
-  
+  pokemon Database: https://pokemondb.net/pokedex/game/x-y
+  pythonPackages : https://pypi.org/
+    package eg: https://pypi.org/project/prettytable/
+    prettytable tutorial: https://code.google.com/archive/p/prettytable/wikis/Tutorial.wiki
+    turtle package documentation: https://docs.python.org/3/library/turtle.html
+    turtle color: https://cs111.wellesley.edu/reference/colors
+
 Keyboard Shortcuts:
   PyCharm: https://www.jetbrains.com/help/pycharm/mastering-keyboard-shortcuts.html
   Windows: https://support.microsoft.com/en-gb/windows/windows-keyboard-tips-and-tricks-588e0b72-0fff-6d3f-aeee-6e5116097942
