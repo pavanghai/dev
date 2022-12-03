@@ -1,3 +1,7 @@
+Some Tips:
+  python is case-sensitive, as per pep8 class should be in PascalCase and (attributes(variables) and methods(functions)) should be in snake_case.
+  PascalCase, snake_case, camelCase
+
 Ascii ART:
   https://ascii.co.uk/art
   https://www.asciiart.eu/
@@ -13,6 +17,7 @@ Tools:
   online list building tool: https://listmoz.com/
   online code execution to visualize: https://pythontutor.com/visualize.html#mode=edit
   Emoji's : https://emojipedia.org/hot-beverage/
+  Online Code Sharing: https://pastebin.com/
   pokemon Database: https://pokemondb.net/pokedex/game/x-y
   pythonPackages : https://pypi.org/
     package eg: https://pypi.org/project/prettytable/
