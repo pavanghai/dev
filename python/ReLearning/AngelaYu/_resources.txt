@@ -18,6 +18,7 @@ Tools:
   online code execution to visualize: https://pythontutor.com/visualize.html#mode=edit
   Emoji's : https://emojipedia.org/hot-beverage/
   Online Code Sharing: https://pastebin.com/
+  Open Trivia Database: https://opentdb.com/   <-- api for database. Used for quiz 
   pokemon Database: https://pokemondb.net/pokedex/game/x-y
   pythonPackages : https://pypi.org/
     package eg: https://pypi.org/project/prettytable/
