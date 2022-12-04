@@ -1,8 +1,0 @@
-{
-    "autoDocstring.docstringFormat": "one-line-sphinx",
-    "autoDocstring.includeExtendedSummary": true,
-    "autoDocstring.includeName": true,
-    "autoDocstring.startOnNewLine": true,
-    "files.autoSave": "afterDelay",
-    "editor.rulers": [80]
-}
