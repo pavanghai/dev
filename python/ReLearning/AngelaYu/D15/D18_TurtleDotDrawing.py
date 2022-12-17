@@ -9,10 +9,8 @@ def color_list(file, no_of_colors):
     return [(c.rgb.r, c.rgb.g, c.rgb.b) for c in colors]
 
 
-colors = color_list('D18_HirstPainting.jpg',30)
-print(type(colors), colors)
-
 # create 10 x 10 painting from the color list
+colors = color_list('D18_HirstPainting.jpg',30)
 screen = t.Screen()
 screen.setworldcoordinates(-400,-300, screen.window_width(), screen.window_height())
 dot = t.Turtle()
@@ -28,4 +26,3 @@ for _ in range(10):
         dot.fd(50)
 
 screen.exitonclick()
-
