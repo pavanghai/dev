@@ -15,6 +15,7 @@ Flow charts:
 
 Tools:
   online list building tool: https://listmoz.com/
+  online color visualiser: https://www.colorspire.com/ or https://www.w3schools.com/colors/colors_rgb.asp
   online code execution to visualize: https://pythontutor.com/visualize.html#mode=edit
   Emoji's : https://emojipedia.org/hot-beverage/
   Online Code Sharing: https://pastebin.com/
