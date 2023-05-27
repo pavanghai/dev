@@ -1,0 +1,51 @@
+<Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>column<stuItem>
+    <stuItemSting>I am column and I like to be column because I am column</stuItemSting>
+</Student><Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>samosa<stuItem>
+    <stuItemSting>I am samosa and I like to be samosa because I am samosa</stuItemSting>
+</Student><Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>kachori<stuItem>
+    <stuItemSting>I am kachori and I like to be kachori because I am kachori</stuItemSting>
+</Student><Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>chole<stuItem>
+    <stuItemSting>I am chole and I like to be chole because I am chole</stuItemSting>
+</Student><Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>bhature<stuItem>
+    <stuItemSting>I am bhature and I like to be bhature because I am bhature</stuItemSting>
+</Student><Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>panipuri<stuItem>
+    <stuItemSting>I am panipuri and I like to be panipuri because I am panipuri</stuItemSting>
+</Student><Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>chartMasala<stuItem>
+    <stuItemSting>I am chartMasala and I like to be chartMasala because I am chartMasala</stuItemSting>
+</Student><Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>mango<stuItem>
+    <stuItemSting>I am mango and I like to be mango because I am mango</stuItemSting>
+</Student><Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>rose<stuItem>
+    <stuItemSting>I am rose and I like to be rose because I am rose</stuItemSting>
+</Student><Student>
+    <studentclass>8thstd</studentclass>
+    <studentsubject>math</<studentsubject>
+    <stuItem>banana<stuItem>
+    <stuItemSting>I am banana and I like to be banana because I am banana</stuItemSting>
+</Student>
