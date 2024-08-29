@@ -1,0 +1,15 @@
+Links
+  https://docs.oracle.com/en/database/oracle/oracle-database/19/lnpls/loe.html     # <== PLSQL
+  https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/MERGE.html
+  https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/Introduction-to-Oracle-SQL.html
+  https://www.ibm.com/docs/en/db2/11.5?topic=plsql-anonymous-block-statement
+  https://www.plsqltutorial.com/plsql-case-statement/
+  https://www.tutorialspoint.com/plsql/index.htm
+  https://www.oracletutorial.com/plsql-tutorial/
+  https://en.wikibooks.org/wiki/Oracle_Database/SQL_Cheatsheet#Basic_PL/SQL_Types
+  https://www.psoug.org/browse.htm?cid=4
+Online Compilers
+  https://onecompiler.com/oracle
+  https://livesql.oracle.com
+  https://www.w3schools.com/sql/sql_editor.asp
+  https://www.tutorialspoint.com/execute_sql_online.php
