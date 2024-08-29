@@ -1,0 +1,80 @@
+//@version=5
+indicator("A006 RSI CrossOver", "XRSI")
+//#region SMA Defining and plotting section 
+sma_source = input.source(close, "SAM ON:", tooltip = "SAM on Close, open, etc..", group = "---SMA---" )
+sma_line = input.int(8, "SMA line", tooltip = "Provide SMA Line", group = "---SMA---")
+sma = ta.sma(sma_source,sma_line)
+plot(sma,"SMA", color = close > sma ? color.green: color.red, force_overlay = true) 
+//#endregion
+//#region RSI Defining and plotting section 
+rsi_source = input(close, "RSI on: ", tooltip = "Calculate RSI on ?", group = "---RSI---")
+rsi_len = input.int(14, "RSI Period", tooltip = "Select RSI period", group = "---RSI---")
+rsi_MAlen = input.int(14, "RSI Moving Average", tooltip = "Select RSI period Moving Average", group = "---RSI---")
+rsi_overBought = input.int(75, "RSI Over Bought", options = [50,55,60,65,70,75,80,85,90,95],
+                 tooltip = "Select Over Bought line", group = "---RSI---")
+rsi_MidLine = input.int(50, "RSI Mid Line", minval = 30, maxval = 70, 
+                 tooltip = "Select Mid line for cross over signal", group = "---RSI---")
+
+rsi_overSold = input.int(25, "RSI Over Sold", options = [5,10,15,20,25,30,35,40,45,50],
+                 tooltip = "Select Over Sold line", group = "---RSI---")
+
+rsi_Hh100 = plot(100, editable = false)
+rsi_OBLine = plot(rsi_overBought, "Over Bought",color = color.red, editable = false)
+fill(rsi_Hh100, rsi_OBLine, color.new(color.red, 80))
+
+plot(rsi_MidLine, "center line", color.gray, editable = false)
+
+rsi_OSLine = plot(rsi_overSold, "Over Sold",color = color.green, editable = false)
+rsi_Lh0 = plot(0, editable = false)
+fill(rsi_Lh0, rsi_OSLine, color.new(color.green, 80))
+
+rsi_ = ta.rsi(rsi_source,rsi_len)
+rsi_ma = ta.sma(rsi_,rsi_MAlen)
+
+plot(rsi_, "RSI", color = input.color(color.navy, "RSI Color", tooltip = "Provide RSI color",
+                                     group = "---RSI---"), editable = false)
+plot(rsi_ma, "RSI MA", color = input.color(color.purple, "RSI MA Color", tooltip = "Provide RSI MA color",
+                                     group = "---RSI---"), editable = false)
+//#endregion
+//#region signal logic
+rOver = ta.crossover(rsi_, rsi_ma)
+rmaOver = ta.crossover(rsi_ma, rsi_MidLine)
+
+rUnder = ta.crossunder(rsi_, rsi_ma)
+rmaUnder = ta.crossunder(rsi_ma, rsi_MidLine)
+// // Buy signal: source(close) above SMA and rsi_ma crossover rsi and rsi below 40
+// buy_signal = sma_source > sma and ta.crossover(rsi_, rsi_ma) and rsi_ < 40
+// // sell signal: source(close) below SMA and rsi_ma crossbelow rsi and rsi above 60
+// sell_signal = sma_source < sma and ta.crossunder(rsi_, rsi_ma) and rsi_ > 60
+//#############################################//
+// Buy signal: rsi_ma crossbelow mid line : Point A rsi_ma crossover mid line : Point B Signal at point B 
+//                only if rsi crossover rsi_ma only once 
+var validBuy = false
+if rmaUnder
+    validBuy := true
+
+if rUnder
+    validBuy := false
+buy_signal = rmaOver and validBuy
+// plotshape(validBuy ? rsi_MidLine : na, location = location.absolute) //Debugging
+plotshape(buy_signal ? rsi_MidLine : na, location = location.absolute, color = color.green,
+         style = shape.labelup, text = "Buy", textcolor = color.white)
+
+// Sell signal: rsi_ma crossover mid line : Point A rsi_ma crossbelow mid line : Point B Signal at point B 
+//                only if rsi crossbelow rsi_ma only once 
+var validSell = false
+if rmaOver
+    validSell := true
+if rOver
+    validSell := false
+sell_signal = rmaUnder and validSell
+
+// plotshape(validSell ? rsi_MidLine : na, location = location.absolute) //Debugging
+plotshape(sell_signal ? rsi_MidLine : na, location = location.absolute, color = color.red,
+         style = shape.labeldown, text = "Sell", textcolor = color.white)
+
+if buy_signal or sell_signal // For debug logs
+    log.warning("BarIndex:" + str.tostring(bar_index) + " B_Signal: " + str.tostring(buy_signal)
+         + " S_Signal: " + str.tostring(sell_signal) + "\n Last Price: " + str.tostring(close))
+//#endregion
+

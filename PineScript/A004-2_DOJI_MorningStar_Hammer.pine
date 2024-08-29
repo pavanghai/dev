@@ -1,0 +1,70 @@
+//@version=5
+indicator("A004-2 DOJI | Morning Star | Hammer", overlay = true)
+
+cBody = math.abs(close-open)
+cRange = high-low
+cMin = math.min(close, open)
+cMax = math.max(close, open)
+
+//#region ema
+emaSrc = input.source(close, "EMA Source", inline = "ema")
+emaLen = input.int(50, "Length", inline = "ema", tooltip = "provide source for EMA and its length")
+
+ema = ta.ema(emaSrc, emaLen)
+plot(ema, "EMA", emaSrc > ema ? color.green : color.red, editable = false)
+//#endregion
+
+//#region morningStar: 3 candle pattern 1st candle red 3rd candle green 2nd candle body less than 1 and 3 body
+ms_tip = "Untick to turn off morning star pattern, can set legout body length, tick location to display below EMA"
+morningStarI = input.bool(true, "Morning Star", inline = "ms")
+msBodyMlt = input.int(2, "legs multiplyer", inline = "ms")
+msLocI = input.bool(false, "Location", inline = "ms", tooltip = ms_tip)
+
+msBody = math.abs(close[1]-open[1])
+ms_max = math.max(close[1], open[1])
+morningStar = close > open and open > ms_max and ms_max < close[2] and close[2] < open[2]
+              and (msBody * msBodyMlt) <= cBody
+
+morningStarP = msLocI ?  high < ema and morningStar : morningStar
+plotshape(morningStarP and morningStarI, "Morning Star", shape.labelup, location.belowbar,
+           color.green, -1, "Morning Star", color.white) 
+
+if morningStarI and morningStarP and not msLocI
+    log.info("\nMS body: " + str.tostring(msBody) + " C Body: " + str.tostring(cBody)
+     + " Leg M "+ str.tostring(msBody * msBodyMlt))
+if morningStarI and morningStarP and msLocI
+    log.warning("\nMS body: " + str.tostring(msBody) + " C Body: " + str.tostring(cBody)
+     + " Leg M "+ str.tostring(msBody * msBodyMlt))
+//#endregion
+//#region doji: body is 0 an relax is % of range
+doji_tip = "Untick to turn off doji pattern, Relax % is float 0.1 is 10%, 0.2 is 20% and so on... doji body to candle"
+dojiI = input.bool(true, "Doji", inline = "dj")
+dojiBodyMlt = input.float(0.00, "Relax %", 0.00, 1.00, 0.05, inline = "dj", tooltip = doji_tip)
+
+doji = cBody <= (cRange * dojiBodyMlt)
+plotshape(dojiI and doji, "Doji", shape.labelup, location.belowbar, color.blue, text = "Doji", textcolor = color.white) 
+if dojiI and doji
+    log.info("\nRange: " + str.tostring(cRange) + " RangeM: " + str.tostring(cRange * dojiBodyMlt)
+     + " Body: " + str.tostring(cBody)+ "\nHigh: " + str.tostring(high) + " m: " + str.tostring(dojiBodyMlt))
+
+if dojiI and doji and (cRange * dojiBodyMlt) >= dojiBodyMlt/2
+    log.warning("\nRange: " + str.tostring(cRange) + " RangeM: " + str.tostring(cRange * dojiBodyMlt)
+     + " Body: " + str.tostring(cBody)+ "\nHigh: " + str.tostring(high) + " m: " + str.tostring(dojiBodyMlt))
+//#endregion
+//#region Hammer: small body and long down tail 
+ham_tip = "Untick to turn off Hammer pattern, can set tail length, tick location to display below EMA"
+hamI = input.bool(true, "Hammer", inline = "h")
+hamBodyMlt = input.int(2, "Tail length _ times", inline = "h")
+hamLocI = input.bool(false, "Location", inline = "h", tooltip = ham_tip)
+
+hammer = (cMin-low) >= (cBody * hamBodyMlt) and cMax == high
+hammerP = hamLocI ?  high < ema and hammer : hammer
+plotshape(hammerP and hamI, "Hammer", shape.labelup, location.belowbar,
+           color.green, text = "Hammer", textcolor = color.white) 
+
+if hammerP and hamI
+    log.info("\nH: " + str.tostring(high) + "L: " + str.tostring(low) + "\nrange"+ str.tostring(cRange)
+     + "Body: " + str.tostring(cBody) + "\ntail: " + str.tostring(cMin-low) + " M: " + str.tostring(cMin)
+     + "\nBodyMul : " + str.tostring(cBody * hamBodyMlt)  )
+//#endregion
+

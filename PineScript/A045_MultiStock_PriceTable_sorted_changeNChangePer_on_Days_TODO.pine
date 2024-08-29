@@ -1,0 +1,14 @@
+//@version=5
+indicator("A045 Multi Stock Price Table sorted change N ChangePer on days", overlay = true)
+//#region input
+daysBack = input.int(1, "Days Back", inline = "days")
+isAsend = input.bool(true, "Asending", inline = "days")
+brdLocY = input.string("Top", "Position", ["Top", "Middle", "Bottom"], inline = "position")
+brdLocX = input.string("Right", "", ["Right", "Center", "Left"], inline = "position")
+
+var table board = table.new(str.lower(brdLocY + "_" + brdLocX), 2,2)
+if barstate.islast
+    board.cell(0,0,"test")
+
+    
+plot(close)

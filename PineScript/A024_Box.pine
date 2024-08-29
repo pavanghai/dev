@@ -1,0 +1,41 @@
+//@version=5
+indicator("A024 Box", overlay = true)
+// 1. Upper range high + x %     2. Lower Range low - x %     3. Input for color (Upper and lower range)
+// 4. Extend till last candle    5. N number of session box should display on chart"
+near = input.float(0.25, "Near %", inline = "per") / 100
+far = input.float(1.0, "far %", inline = "per") / 100
+upClr = input.color(color.new(color.red, 70), "High Color", inline = "cr")
+dnClr = input.color(color.new(color.green, 70), "Low Color", inline = "cr")
+numBox = input.int(5, "No of Box Sets: ", inline = "box")
+isExtend = input.bool(false, "Exend to Last", inline = "box")
+
+upFar = high * (1 + far)
+upNear = high * (1 + near)
+dnNear = low * (1 - near)
+dnFar = low * (1 - far)
+upText = "H: " + str.tostring(high) + " T: " + str.tostring(upFar) + " B: " + str.tostring(upNear)
+dnText = "L: " + str.tostring(low) + " T: " + str.tostring(dnNear) + " B: " + str.tostring(dnFar)
+var box upBox = na 
+var box dnBox = na 
+
+var float valWhen = 0.0
+count = ta.barssince(session.isfirstbar)
+
+plot(count, color = color.orange, display = display.status_line)
+plot(session.isfirstbar ? count[1] : na , color = color.maroon, display = display.status_line)
+valWhen := ta.valuewhen(session.isfirstbar, high, 3)
+
+if session.isfirstbar
+    upBox := box.new(bar_index, upFar, bar_index + count[1], upNear, bgcolor = upClr, text = upText, text_halign =  text.align_left)
+    dnBox := box.new(bar_index, dnNear, bar_index + count[1], dnFar, bgcolor = dnClr, text = dnText, text_halign =  text.align_left)
+    box.delete(upBox[(count[1]+1)*numBox])
+    box.delete(dnBox[(count[1]+1)*numBox])
+else
+    if not isExtend
+        upBox.set_right(bar_index)
+        dnBox.set_right(bar_index)
+
+// if barstate.islast
+//     label.new(bar_index,high, str.tostring(count[1]), style = label.style_label_down, color = color.yellow)
+// if session.islastbar
+//     label.new(bar_index,high, str.tostring(count[1]) + " : " + str.tostring(valWhen), style = label.style_label_down, color = color.yellow)

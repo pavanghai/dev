@@ -1,0 +1,238 @@
+//@version=5
+indicator("A026-3 Classic Plot Pivot Line, Labels with MTF", overlay = true)
+//draw pivotPoint with RS's option to extend and show history with show lines and label with MultiTimeFrame
+//#region constant declaration: color, pivotpoint
+RED    = #FF0000
+DRED   = #8B0000
+GREEN  = #008000
+DGREEN = #006400
+BLACK  = #000000
+WHITE  = #FFFFFF
+LGRAY  = #CCCCCC
+BLUE   = #0000FF
+LBLUE  = #00FFFF
+DBLUE  = #00005B
+
+LABEL_DN = label.style_label_down
+LABEL_UP = label.style_label_up
+
+PP = hlc3 // Classic Pivot Points: https://www.mypivots.com/dictionary/definition/46/classic-pivot-points
+CR = high - low //Candle Range
+R1 = (2 * PP) - low
+S1 = (2 * PP) - high
+R2 =  PP + CR
+S2 =  PP - CR
+R3 =  PP + CR * 2
+S3 =  PP - CR * 2
+R4 =  PP + CR * 3
+S4 =  PP - CR * 3
+R5 =  PP + CR * 4
+S5 =  PP - CR * 4
+
+var line PPL = na
+var line R1L = na
+var line S1L = na
+var line R2L = na
+var line S2L = na
+var line S3L = na
+var line R3L = na
+var line R4L = na
+var line S4L = na
+var line R5L = na
+var line S5L = na
+var line mtfPPL = na
+var line mtfR1L = na
+var line mtfS1L = na
+var line mtfR2L = na
+var line mtfS2L = na
+
+var label PPLeb = na
+var label R1Leb = na
+var label S1Leb = na
+var label R2Leb = na
+var label S2Leb = na
+var label S3Leb = na
+var label R3Leb = na
+var label R4Leb = na
+var label S4Leb = na
+var label R5Leb = na
+var label S5Leb = na
+var label mtfPPLeb = na
+var label mtfR1Leb = na
+var label mtfS1Leb = na
+var label mtfR2Leb = na
+var label mtfS2Leb = na
+
+//#endregion
+//#region declare user inputs and function 
+isMTF = input.bool(true, "MTF", inline = "mtf")
+tf = input.timeframe("60", "TimeFrame",["30", "60", "120", "180", "240"], inline = "mtf")
+sGrp = "On Off Switch"
+isHist = input.bool(true, "Historical", inline = "onOff", group = sGrp)
+isLabel = input.bool(true, "Labels ", inline = "onOff", group = sGrp)
+isLine = input.bool(true, "Lines ", inline = "onOff", group = sGrp)
+
+lineNos = input.int(2, " SR lines", 1,5, inline = "line")
+isLineExt = input.bool(true, "Lines Extend", inline = "line")
+
+drawLines(point=hlc3, clr = #0000FF, width = 1) =>
+    line.new(x1 = bar_index, y1 = point, x2 = bar_index + 10, y2 = point, color = clr, width = width)
+
+drawLabels(point=hlc3, bgCol = #CCCCCC, style = label.style_label_left) =>
+    label.new(x = bar_index, y = point, text = str.tostring(point, format.mintick)
+     , style=style, color = bgCol, textcolor = BLACK)
+//#endregion
+[mtfPP,mtfCR,mtfR1,mtfS1,mtfR2,mtfS2] = request.security("", tf,[PP,CR,R1,S1,R2,S2]) //keeping small numbers only
+
+//#region line and label drawings on current frame
+if session.isfirstbar
+    if isLine
+        PPL := drawLines()
+        R1L := drawLines(R1, RED)
+        S1L := drawLines(S1, GREEN)
+        if isLabel
+            PPLeb := drawLabels(PP, color.new(LGRAY,50))
+            R1Leb := drawLabels(R1, color.new(RED,85))
+            S1Leb := drawLabels(S1, color.new(GREEN,85))
+
+        if lineNos >= 2 
+            R2L := drawLines(R2, RED, 2)
+            S2L := drawLines(S2, GREEN, 2)
+            if isLabel
+                R2Leb := drawLabels(R2, color.new(RED,75))
+                S2Leb := drawLabels(S2, color.new(GREEN,75))
+
+        if lineNos >= 3
+            R3L := drawLines(R3, RED, 3)
+            S3L := drawLines(S3, GREEN, 3)
+            if isLabel
+                R3Leb := drawLabels(R3, color.new(RED,75))
+                S3Leb := drawLabels(S3, color.new(GREEN,75))
+
+        if lineNos >= 4
+            R4L := drawLines(R4, RED, 4)
+            S4L := drawLines(S4, GREEN, 4)
+            if isLabel
+                R4Leb := drawLabels(R4, color.new(RED,75))
+                S4Leb := drawLabels(S4, color.new(GREEN,75))
+
+        if lineNos >= 5
+            R5L := drawLines(R5, RED, 5)
+            S5L := drawLines(S5, GREEN, 5)
+            if isLabel
+                R5Leb := drawLabels(R5, color.new(RED,75))
+                S5Leb := drawLabels(S5, color.new(GREEN,75))
+        if isMTF
+            mtfPPL := drawLines(mtfPP, DBLUE,3)
+            mtfR1L := drawLines(mtfR1, DRED,3)
+            mtfS1L := drawLines(mtfS1, DGREEN,3)
+            if isLabel
+                mtfPPLeb := drawLabels(mtfPP, color.new(LGRAY,30))
+                mtfR1Leb := drawLabels(mtfR1, color.new(DRED,65))
+                mtfS1Leb := drawLabels(mtfS1, color.new(DGREEN,65))
+            if lineNos >= 2 
+                mtfR2L := drawLines(mtfR2, DRED, 5)
+                mtfS2L := drawLines(mtfS2, DGREEN, 5)
+                if isLabel
+                    mtfR2Leb := drawLabels(mtfR2, color.new(DRED,65))
+                    mtfS2Leb := drawLabels(mtfS2, color.new(DGREEN,65))
+
+    if not isHist
+        line.delete(PPL[1])
+        line.delete(R1L[1])
+        line.delete(S1L[1])
+        line.delete(R2L[1])
+        line.delete(S2L[1])
+        line.delete(S3L[1])
+        line.delete(R3L[1])
+        line.delete(R4L[1])
+        line.delete(S4L[1])
+        line.delete(R5L[1])
+        line.delete(S5L[1])
+        line.delete(mtfPPL[1])
+        line.delete(mtfR1L[1])
+        line.delete(mtfS1L[1])
+        line.delete(mtfR2L[1])
+        line.delete(mtfS2L[1])
+
+        label.delete(PPLeb[1])
+        label.delete(R1Leb[1])
+        label.delete(S1Leb[1])
+        label.delete(R2Leb[1])
+        label.delete(S2Leb[1])
+        label.delete(S3Leb[1])
+        label.delete(R3Leb[1])
+        label.delete(R4Leb[1])
+        label.delete(S4Leb[1])
+        label.delete(R5Leb[1])
+        label.delete(S5Leb[1])
+        label.delete(mtfPPLeb[1])
+        label.delete(mtfR1Leb[1])
+        label.delete(mtfS1Leb[1])
+        label.delete(mtfR2Leb[1])
+        label.delete(mtfS2Leb[1])
+else
+    PPL.set_x2(bar_index)
+    R1L.set_x2(bar_index)
+    S1L.set_x2(bar_index)
+    R2L.set_x2(bar_index)
+    S2L.set_x2(bar_index)
+    S3L.set_x2(bar_index)
+    R3L.set_x2(bar_index)
+    R4L.set_x2(bar_index)
+    S4L.set_x2(bar_index)
+    R5L.set_x2(bar_index)
+    S5L.set_x2(bar_index)
+    mtfPPL.set_x2(bar_index)
+    mtfR1L.set_x2(bar_index)
+    mtfS1L.set_x2(bar_index)
+    mtfR2L.set_x2(bar_index)
+    mtfS2L.set_x2(bar_index)
+
+    PPLeb.set_x(bar_index)
+    R1Leb.set_x(bar_index)
+    S1Leb.set_x(bar_index)
+    R2Leb.set_x(bar_index)
+    S2Leb.set_x(bar_index)
+    S3Leb.set_x(bar_index)
+    R3Leb.set_x(bar_index)
+    R4Leb.set_x(bar_index)
+    S4Leb.set_x(bar_index)
+    R5Leb.set_x(bar_index)
+    S5Leb.set_x(bar_index)
+    mtfPPLeb.set_x(bar_index)
+    mtfR1Leb.set_x(bar_index)
+    mtfS1Leb.set_x(bar_index)
+    mtfR2Leb.set_x(bar_index)
+    mtfS2Leb.set_x(bar_index)    
+
+
+    if isLineExt
+        PPL.set_extend(extend.right)
+        R1L.set_extend(extend.right)
+        S1L.set_extend(extend.right)
+        R2L.set_extend(extend.right)
+        S2L.set_extend(extend.right)
+        S3L.set_extend(extend.right)
+        R3L.set_extend(extend.right)
+        R4L.set_extend(extend.right)
+        S4L.set_extend(extend.right)
+        R5L.set_extend(extend.right)
+        S5L.set_extend(extend.right)
+        mtfPPL.set_extend(extend.right)
+        mtfR1L.set_extend(extend.right)
+        mtfS1L.set_extend(extend.right)
+        mtfR2L.set_extend(extend.right)
+        mtfS2L.set_extend(extend.right)
+
+        // HOW TO DO THIS ? want to convert above elements via loop 
+        // e = ""
+        // for i = 1 to lineNos
+        //     e := "R"+str.tostring(i)+"L"
+        //     e.set_extend(extend.right)
+//#endregion
+//#region HTF
+// [mtfPP,mtfCR,mtfR1,mtfS1,mtfR2,mtfS2,mtfR3,mtfS3] = request.security("", tf,[PP,CR,R1,S1,R2,S2,R3,S3])
+
+
+//endregion

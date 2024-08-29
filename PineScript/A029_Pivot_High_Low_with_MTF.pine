@@ -1,0 +1,92 @@
+//@version=5
+indicator("A029 Pivot High Low with MTF", overlay = true)
+//#region Constant and inputs
+ORANGE = #FF6600
+RED    = #FF0000
+DRED   = #990000
+BLUE   = #0000FF
+GREEN  = #00FF00
+DGREEN = #009900
+BLACK  = #000000
+WHITE  = #FFFFFF
+
+isMTF = input.bool(true, "MTF?", inline = "phl")
+mtf = input.timeframe("60", "TimeFrame", inline = "phl")
+len = input.int(10, "Pivot Point Len", inline = "phl")
+//#endregion
+ph = ta.pivothigh(high, len,len)
+pl = ta.pivotlow(low, len,len)
+// plot(ph, "ph with offset", offset = -len)
+// plot(ph, "PH", color = color.green)
+plot(bar_index, "barindex", display = display.status_line, color = ORANGE)
+
+var line hLine = na
+var line lLine = na
+var line mThLine = na
+var line mTlLine = na
+
+[mTph,mTpl, mTtO,mTtC] = request.security("", mtf, [ph,pl, time, time_close])
+
+var High = 0.0
+var HighInd = 0
+var HighTmO = 0
+var HighTmC = 0
+
+
+if not na(ph)
+    hLine := line.new(bar_index[len], ph, bar_index, ph, color=RED, width = 2)
+else
+    hLine.set_x2(bar_index[len-1])
+
+if not na(pl)
+    lLine := line.new(bar_index, pl, bar_index, pl, color=GREEN, width = 2)
+else
+    lLine.set_x2(bar_index[len-1])
+
+var mHTO = 0
+var mHTC = 0
+var mLTO = 0
+var mLTC = 0
+var mHTBI = 0
+
+if ta.change(mTph) //Not working
+    i=0
+    while true
+        if time[i] == mTtO
+            mHTO := bar_index[i]
+            break
+        i += 1
+    log.warning("\nmTO:"+str.format_time(mTtO, "HH:mm") + " tO:"+str.format_time(time, "HH:mm")
+     +"\nmTO:"+str.format_time(mTtC, "HH:mm") + " tC:"+str.format_time(time_close, "HH:mm")+" bI:"+str.tostring(bar_index[i]))        
+
+if isMTF
+    if not na(mTph)
+        i=0
+        while true
+            if high[i] == mTph  //? Why this is working?
+            // if time[i] == mTtO
+                mHTO := bar_index[i]
+                log.error(str.tostring(mHTO))
+                break
+            i += 1    
+        mThLine := line.new(mHTO, mTph, mHTO, mTph, color=DRED, width = 3)//20173 - 20160
+        log.info("\nmTO:"+str.format_time(mTtO, "HH:mm") + " tO:"+str.format_time(time, "HH:mm")+" bI:"+str.tostring(bar_index)
+         +"\nmTO:"+str.format_time(mTtC, "HH:mm") + " tC:"+str.format_time(time_close, "HH:mm")+" bIH:"+str.tostring(bar_index[i]))
+    else
+        mThLine.set_x2(bar_index)
+
+    if not na(mTpl)
+        i=0
+        while true
+            if low[i] == mTpl  //? Why this is working?
+            // if time[i] == mTtO
+                mLTO := bar_index[i]
+                log.error(str.tostring(mLTO))
+                break
+            i += 1    
+        mTlLine := line.new(mLTO, mTpl, mLTO, mTpl, color=DGREEN, width = 3)//20173 - 20160
+        log.info("\nmTO:"+str.format_time(mTtO, "HH:mm") + " tO:"+str.format_time(time, "HH:mm")+" bI:"+str.tostring(bar_index)
+         +"\nmTO:"+str.format_time(mTtC, "HH:mm") + " tC:"+str.format_time(time_close, "HH:mm")+" bIH:"+str.tostring(bar_index[i]))
+    else
+        mTlLine.set_x2(bar_index)
+

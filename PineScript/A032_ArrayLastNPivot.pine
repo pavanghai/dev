@@ -1,0 +1,75 @@
+//@version=5
+indicator("A032 Array Last N Pivot", overlay = true)
+len = input.int(10, "PivotLength", 3, 20)
+nLines = input.int(3, "Total Lines", 1, 20)
+
+ph = ta.pivothigh(len, len)
+pl = ta.pivotlow(len, len)
+
+var phArray = array.new<float>()
+var phArrayBI = array.new<int>()
+var hLArrayBI = array.new<int>()
+
+var plArray = array.new<float>()
+var plArrayBI = array.new<int>()
+var lLArrayBI = array.new<int>()
+
+if not na(ph)
+    phArray.push(ph)
+    phArrayBI.push(bar_index-len)
+    // hLArrayBI.push(bar_index)
+
+if not na(pl)
+    plArray.push(pl)
+    plArrayBI.push(bar_index-len)
+    // lLArrayBI.push(bar_index-len)
+
+
+if phArray.size() > 2
+    phArray.shift()
+    phArrayBI.shift()
+
+if plArray.size() > 2    
+    plArray.shift()
+    plArrayBI.shift()
+
+if hLArrayBI.size() > nLines
+    hLArrayBI.shift()
+if lLArrayBI.size() > nLines
+    lLArrayBI.shift()
+
+var label Label = na 
+var line hLine = na
+var line lLine = na
+var hPlaceHolder = true
+var lPlaceHolder = true
+
+
+if phArray.size() > 1
+    if phArray.first() > phArray.last()
+        if hPlaceHolder
+            hLArrayBI.push(bar_index)
+            delBar = bar_index - hLArrayBI.first()
+            Label := label.new(bar_index, high, "FoundBI: "+str.tostring(bar_index)+" L "+str.tostring(hLArrayBI.last())
+             +" f "+str.tostring(hLArrayBI.first())
+             +" | "+str.tostring(delBar), textcolor = #0000FF, color = #FFFFFF)
+            hLine := line.new(phArrayBI.first(), phArray.first(), bar_index, phArray.first(), color = #FF0000)
+            line.delete(hLine[delBar])
+        else
+            hLine.set_x2(bar_index-len)
+        hPlaceHolder := false
+    else
+        hPlaceHolder := true
+
+if plArray.size() > 1
+    if plArray.first() < plArray.last()
+        if lPlaceHolder
+            lLArrayBI.push(bar_index)
+            delBar = bar_index - lLArrayBI.first()
+            lLine := line.new(plArrayBI.first(), plArray.first(), bar_index, plArray.first(), color = #00FF00)
+            line.delete(lLine[delBar])
+        else
+            lLine.set_x2(bar_index-len)
+        lPlaceHolder := false
+    else
+        lPlaceHolder := true

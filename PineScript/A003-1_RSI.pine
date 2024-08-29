@@ -1,0 +1,18 @@
+//@version=5
+indicator("A003-1 Relative strength index ", "RSI")
+src = input.source(close, "Source", inline = "rsi")
+len = input.int(14, "length", inline = "rsi")
+sm_len = input.int(14, "Smooth length", inline = "rsi")
+ob = input.int(70, "Over Bought", inline = "zone")
+os = input.int(30, "Over Sold", inline = "zone")
+
+rsi = ta.rsi(src, len)
+rsiMA = ta.sma(rsi, sm_len)
+
+plot(rsi, "RSI", color.blue)
+plot(rsiMA, "RSI MA", color.navy)
+
+hline(ob, "Over Bought", color.red, hline.style_dashed)
+hline(50, "Center Line", color.black, hline.style_dashed)
+hline(os, "Over Sold", color.green, hline.style_dashed)
+

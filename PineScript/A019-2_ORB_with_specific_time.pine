@@ -1,0 +1,21 @@
+//@version=5
+indicator("A019-2 ORB with specific time", overlay = true)
+t_tt = "Provide time as HH:MM to mark high and low of that time frame, " 
+ + "provide GMT eg -0700 for Arizona US +0530 for India"
+timeI = input.string("17:06", "HL Time", inline = "tm")
+gmtI = input.string("-0700", "GMT", inline = "tm", tooltip = t_tt)
+
+c_time_str = str.format_time(time, "HH:mm", "GMT"+gmtI)
+log.info("\nTS: " + c_time_str + " HLTime: " + timeI + " GMT: " + gmtI)
+var High = 0.0
+var Low = 0.0
+if c_time_str == timeI
+    log.warning("\nTS: " + c_time_str + " HLTime: " + timeI + " GMT: " + gmtI)
+    High := high
+    Low := low
+
+plotshape(c_time_str == timeI, "userTime", style = shape.labeldown, text = "userTime", textcolor = color.white)
+// plot(c_time_str == timeI  ? high : na , "Low", color.green)//, style = plot.style_linebr)
+plot(High, "High", color.red)
+plot(Low , "Low", color.green)
+

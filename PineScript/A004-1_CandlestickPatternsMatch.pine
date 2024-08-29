@@ -1,0 +1,46 @@
+//@version=5
+indicator("A004-1 Candlestick Patterns Match","CPM", true)
+//#region Candle's related variables 
+// Price value
+c_bodyHi = math.max(open,close)
+c_bodyLo = math.min(open,close)
+// price points based on calculations 
+c_body = c_bodyHi - c_bodyLo
+c_range = high - low
+c_upWick = high - c_bodyHi
+c_dnWick = c_bodyLo - low
+
+c_data_str = "Index: " + str.tostring(bar_index)
+         + " \nR: " + str.tostring(c_range) + " B: " + str.tostring(c_body)
+         + " \nH: " + str.tostring(high) + " L: " + str.tostring(low)
+         + " O: " + str.tostring(open) + " C: " + str.tostring(close)
+         + "\nUpShadow: " + str.tostring(c_upWick) + " DownShadow: " + str.tostring(c_dnWick)
+// log.info(c_data_str)
+//#endregion
+
+sma_ = ta.sma(close, input.int(20,"SMA", [5,10,15,20,30,50,80,100]))
+plot(sma_,"SMA",close > sma_? color.green:color.red)
+plot(bar_index,display = display.status_line)
+
+//#region Hammer 
+     // The candlestick has a small body with little to no upper shadow 
+     // and the lower shadow is usually at least twice the size of the body, but can be even bigger.
+hammer_mty = input.int(2, "Hammer Multiplier", tooltip = "Provide lower Shadow Multiplier of body",
+      group = "===Hammer===")
+hammer_up_wick = input.float(0.25, "Hammer Upper Wick", options = [0.00, 0.25, 0.5, 0.75],
+     tooltip = "Select: Hammer candle's upper Shadow", group = "===Hammer===")
+hammer_strictI = input.bool(true, "Strict Hammer ON/OFF", group = "===Hammer===")
+hammer = c_upWick <= c_body * hammer_up_wick and hammer_mty * c_body < c_dnWick
+hammer_strict = close < sma_ 
+
+plotshape(hammer_strictI ? hammer_strict and hammer : hammer, "hammer", style = shape.labelup,
+           location = location.belowbar, color = color.white, text = "hammer")
+
+// Logs for debugging 
+if hammer_strictI ? hammer_strict and hammer : hammer
+    log.warning(str.tostring(bar_index)
+         + "\nUW: " + str.tostring(c_upWick) + " HH: " + str.tostring(c_body * hammer_up_wick)
+         + " \nB: " + str.tostring(c_body) 
+         + " \nLW: " + str.tostring(c_dnWick) + " DB: " + str.tostring(hammer_mty * c_body))
+//#endregion
+

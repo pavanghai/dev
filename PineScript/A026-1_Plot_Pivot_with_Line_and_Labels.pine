@@ -1,0 +1,79 @@
+//@version=5
+indicator("A026-1 Plot Pivot with Line and Labels", overlay = true, max_lines_count = 10 * 20)
+//#region constant_declarations: colors, label.style, variables for line
+color RED    = #FF0000
+color DRED   = #8B0000
+color GREEN  = #008000
+color DGREEN = #006400
+color BLACK  = #000000
+color WHITE  = #FFFFFF
+color LGRAY  = #CCCCCC
+color BLUE   = #0000FF
+
+LABEL_DN = label.style_label_down
+LABEL_UP = label.style_label_up
+
+var line EL = na
+var line R1L = na
+var line S1L = na
+var line R2L = na
+var line S2L = na
+var line R3L = na
+var line S3L = na
+
+float PP = hlc3
+float S1 = (PP*2) - high
+float R1 = (PP*2) - low
+float R2 = PP + (high-low)
+float S2 = PP - (high-low)
+float R3 = high + 2 * (PP - low)
+float S3 = low - 2 * (high - PP)
+//#endregion
+//#region user inputs: switches for mtf, history, line, label | TimeFrame, lines, label
+mtfSwitch = input.bool(true, "MTF On/Off", inline = "mtf")
+tf = input.timeframe("", "TimeFrame", inline = "mtf")
+
+histSwitch = input.bool(true, "Historical On/Off", inline = "hisline")
+histLines = input.int(3, "Lines",1,20,inline = "hisline")//default maxline count: 50, to Increase change in indicator()
+
+lineSwitch = input.bool(true, "Lines On/Off ", inline = "onoff")
+lineNos = input.int(2, " SR lines", [1,2,3], inline = "onoff")
+labelSwitch = input.bool(true, "Labels On/Off", inline = "onoff")
+//#endregion
+//#region function_declarations: drawLines and drawLabels
+drawLines(barIndex = bar_index, price = close, clr = #0000FF, width = 1) =>
+    line.new(x1 = barIndex, y1 = price, x2 = barIndex + 5, y2 = price, color = clr, width = width)
+
+drawLabels(offSet = 0, price = close, style = label.style_label_left, bgCol = #FFFFFF) =>
+    label.new(x = bar_index[offSet], y = price, text = str.tostring(price, format.mintick)
+     , style=style, color = bgCol, textcolor = BLACK)        
+//#endregion    
+
+// [mTHLC3, mTC, mTT, MTTClo, mTpH, mTpL] = request.security("", tf, [hlc3, close, time, time_close, ppH, ppL])
+
+if session.isfirstbar
+    EL := drawLines(price = PP)
+    R1L := drawLines(price = R1, clr = RED)
+    S1L := drawLines(price = S1, clr = GREEN)
+    R2L := drawLines(price = R2, clr = RED, width = 2)
+    S2L := drawLines(price = S2, clr = GREEN, width = 2)
+    R3L := drawLines(price = R3, clr = RED, width = 3)
+    S3L := drawLines(price = S3, clr = GREEN, width = 3)
+    if not histSwitch
+        line.delete(EL[3])
+        line.delete(EL[1])
+        line.delete(R1L[1])
+        line.delete(S1L[1])
+        line.delete(R2L[1])
+        line.delete(S2L[1])
+        line.delete(R3L[1])
+        line.delete(S3L[1])
+else
+    EL.set_x2(bar_index)  
+    R1L.set_x2(bar_index)
+    S1L.set_x2(bar_index)  
+    R2L.set_x2(bar_index)  
+    S2L.set_x2(bar_index)  
+    R3L.set_x2(bar_index)  
+    S3L.set_x2(bar_index)  
+

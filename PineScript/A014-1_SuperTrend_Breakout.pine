@@ -1,0 +1,27 @@
+//@version=5
+indicator("A014-1 SuperTrend Breakout", "STB", overlay = true)
+stG = "Super Trend"
+stATR = input.int(10, "ATR Length", inline = "st", group = stG)
+stFactor = input.int(3, "factor", inline = "st", group = stG)
+
+[supertrend, direction] = ta.supertrend(stFactor, stATR)
+stDirUp  = direction < 0
+stDirDwn = direction > 0
+
+stBdy = plot(hl2, editable = false, display = display.none)
+stDwn = plot(stDirDwn ? supertrend : na , color=color.red, style = plot.style_linebr)
+stUP = plot(stDirUp ? supertrend : na , color=color.green, style = plot.style_linebr)
+
+fill(stUP, stBdy, color.new(color.green, 85), editable = false)
+fill(stDwn, stBdy, color.new(color.red, 85), editable = false)
+
+sessionBarIndex = bar_index - ta.valuewhen(session.isfirstbar, bar_index,0)
+plot(bar_index, "bar index", color.olive, display = display.status_line)
+plot(sessionBarIndex, "session bar index", color.orange, display = display.status_line)
+
+var float High = 0.0
+if sessionBarIndex == 0
+    High := high
+
+// plotshape(High)
+plotshape(session.isfirstbar, color = color.yellow)

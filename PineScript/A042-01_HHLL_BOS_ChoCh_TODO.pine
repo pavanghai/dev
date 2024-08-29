@@ -1,0 +1,49 @@
+//@version=5
+//REF: https://youtu.be/VQ4_-ugTyrs?si=6sPKl75B1Yt-Zwju
+// test on jiofin, BPCL indian stock
+indicator("A042 HHLL BOS ChoCh TODO", overlay = true, max_bars_back = 500)
+var hhVal = high
+var hlVal = low
+
+if high > hhVal
+    hhVal := high
+if low < hlVal
+    hlVal := low
+// plot(hhVal, color = #00FF00)
+// plot(hlVal, color = #FF0000)
+
+hhRetrace = hhVal - ((hhVal-hlVal) * 0.38)
+// plot(hhRetrace, color = #FFA000)
+
+var hhIndex = 0 
+
+if ta.change(hhVal)
+    hhIndex := bar_index
+
+var isBOS = false
+if ta.crossunder(low, hhRetrace)
+    isBOS := true
+    label.new(hhIndex, hhVal, "HH", textcolor = color.white)
+
+// plotshape(low < hhRetrace) // Check if low below 38%
+// plotshape(ta.crossunder(low, hhRetrace)) // Check if low crosses 38% line
+lookback = bar_index - hhIndex[1]
+// log.error(str.tostring(lookback))
+if lookback == 0 or na(lookback)
+    lookback := 1
+
+log.warning(str.tostring(lookback))
+hl = ta.lowest(lookback)
+hlIndex = bar_index[math.abs(ta.lowestbars(lookback))]
+
+// plot(hl, color = color.rgb(144, 17, 17))
+// if high > hhVal[1] and isBOS
+if ta.change(hhVal) and isBOS
+    // log.warning("Confirm")
+    // line.new(hhIndex[1], hhVal[1], bar_index, hhVal[1], width = 2, color = color.black)
+    label.new(hlIndex, hl, "HL", style = label.style_label_up, textcolor = color.white)
+    label.new(bar_index, hhVal[1], "BOS", style = label.style_label_lower_right, textcolor = color.white)
+    line.new(hhIndex[1], hhVal[1], hlIndex, hl, width = 2, color = color.gray, style = line.style_dashed)
+    line.new(hlIndex, hl,hhIndex, hhVal,  width = 2, color = color.gray)
+    hlVal := hl
+    isBOS := false

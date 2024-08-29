@@ -1,0 +1,78 @@
+//@version=5
+indicator("A029-2 request.security Pivot High Low 02-07-2024 continue", overlay = true, calc_bars_count = 500)
+
+len = 10
+ph = ta.pivothigh(len, len)
+pl = ta.pivotlow(len, len)
+
+var High = 0.0
+var Low = 0.0
+var highLoc = 0
+var lowLoc = 0
+var mtfhighLoc = 0
+var mtflowLoc = 0
+var line hLine = na
+var line lLine = na
+if not na(ph)
+    High := ph
+    highLoc := time[len]
+    mtfhighLoc := time_close[len]
+    hLine := line.new(bar_index[len],ph, bar_index, ph, color = color.red)
+else
+    hLine.set_x2(bar_index)
+
+if not na(pl)
+    Low := pl
+    lowLoc := time[len]
+    mtflowLoc := time_close[len]
+    lLine := line.new(bar_index[len],pl, bar_index, pl, color = color.green)
+else
+    lLine.set_x2(bar_index)    
+
+[phMtf, plMtf, highLocMTF, lowLocMTF, mtfhLoc, mtflLoc] = request.security("", "60", [ph, pl, highLoc, lowLoc, mtfhighLoc, mtflowLoc])
+
+var line highLine = na
+
+if ta.change(phMtf)
+    // LABEL = label.new(time, HighMTF,"HH", xloc = xloc.bar_time)
+    highLine := line.new(highLocMTF,phMtf, time, phMtf, xloc = xloc.bar_time,color = color.red, width = 5)
+    mi = 0
+    mi2 = 0
+
+    i = 0
+    startIndex = 0
+    endindex = 0
+    while true //mi <= 1000
+        if time[i] == highLocMTF
+            startIndex := bar_index[i]
+            break
+        i += 1
+        // if mi > 1000
+        //     break
+        // mi += 1
+
+    j = 0
+    while mi2 <= 1000
+        if time[j] == mtfhLoc
+            endindex := bar_index[j]
+            break
+        j += 1
+        if mi2 > 1000
+            break
+        mi2 += 1
+    highValue = 0.0
+    highTime = 0
+    for n = bar_index - endindex  to bar_index - startIndex
+        if high[n] >= highValue
+            highValue := high[n]
+            highTime := time[n]
+    log.info(str.tostring(highValue))
+    log.warning(str.format_time(highTime, "HH:mm", "GMT+0530"))
+    highLine.set_x1(highTime)
+else
+    highLine.set_x2(time)
+
+
+plotshape(highLocMTF == time, size=size.huge)
+
+plot(bar_index, display = display.status_line, color=color.yellow)

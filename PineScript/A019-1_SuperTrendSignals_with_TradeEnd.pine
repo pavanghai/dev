@@ -1,0 +1,50 @@
+//@version=5
+indicator("A019-1 SuperTrend signals with TradeEnd", overlay = true)
+import TradingView/ta/7
+//1. Supertrend Indicators with Long Short, Intraday and Positional Options, Intraday Closing Time, Direction > Long,Short or Both, 
+// If only single dir then must provide option for closing. , Option for use Gap(Means no intraday trade if gap)
+// Assignment1: Super Trend signals high / low breakout | only on x days | No trade if gap (gap % by user)
+st_atr = input.int(10, "ATR", inline = "st")
+st_fac = input.int(3, "Factor", inline = "st")
+intra_tt = "Tick Intraday to close trade on Close TIme(24hr format HH:MM), default is 15:00(3:00pm)"
+isintra = input.bool(true, "Intraday", inline = "int")
+intra_tm = input.string("15:00", "Close Time", inline = "int", tooltip = intra_tt)
+
+[supertrend, direction] = ta.supertrend(3, 10)
+is_st_up = direction < 0
+is_st_dn = direction > 0
+st_p_up = plot(is_st_up ? supertrend : na, "Up direction", color = color.green, style=plot.style_linebr)
+st_p_dn = plot(is_st_dn ? supertrend : na, "Down direction", color = color.red, style=plot.style_linebr)
+hl2_line = plot(hl2, display = display.none, editable = false)
+fill(hl2_line, st_p_up, color.new(color.green, 90), "ST_UP")
+fill(hl2_line, st_p_dn, color.new(color.red, 90), "ST_Down")
+i_tm_str = str.format_time(time, "HH:mm", syminfo.timezone)
+var float High = na
+var float Low = na
+// var is_buy = false
+if is_st_up and not is_st_up[1] //close > high[1] and 
+    // is_buy := true
+    Low := na
+    High := high
+// plotshape(is_buy)
+// is_buy := false
+if is_st_dn and not is_st_dn[1]
+    High := na
+    Low := low
+plot(High, "High", color.lime, style = plot.style_linebr)
+plot(Low, "Low", color.orange, style = plot.style_linebr)
+
+st_buy = ta.crossover(high, High)
+st_sell = ta.crossunder(low, Low)
+plotshape(st_buy, "ST_buy_sig", shape.labelup, location.belowbar, color.green, text = "Buy", textcolor = color.white)
+plotshape(st_sell, "ST_sell_sig", shape.labeldown, location.abovebar, color.red, text = "Sell", textcolor = color.white)
+if st_sell
+    // st_sell := false // Why this is not working ?
+    Low := na
+if st_buy
+    High := na
+// TODO: Reworking required
+if i_tm_str == intra_tm 
+    log.warning("\nTS: " + i_tm_str + " HLTime: " + intra_tm)
+
+plotshape(i_tm_str == intra_tm and isintra, "userTime", style = shape.labeldown, text = "CLose positions", textcolor = color.white)

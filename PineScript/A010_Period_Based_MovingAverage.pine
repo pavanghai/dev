@@ -1,0 +1,59 @@
+//@version=5
+indicator("A010 Period Based Moving Average","PBMA", overlay = true)
+// ma_grp = "---Moving Average---" //Not using group as only 1 element 
+ma_len_tt = "Moving average on"
+m5 = " 5 Mins"
+m15 = " 15 mins"
+m60 = " 60 mins"
+m16_59 = " 16 Mins to 59 mins"
+m61_240 = " 61 Mins to 240 mins"
+
+isDouble = input.bool(false, "Double Moving Average", "Select if you need 2 moving averages")
+ma = input.string("SMA","Moving Average", ["SMA", "EMA", "WMA", "VWMA", "RMA"], "Smothing Method", inline = "part1")
+ma_src = input.source(close, "source", "Select source to apply moving average", inline = "part1")
+ma_len_5 = input.int(13, m5, 1,200,tooltip = ma_len_tt + m5, inline = "mins") 
+ma_len_15 = input.int(21, m15, 1,200,tooltip = ma_len_tt + m15, inline = "mins") 
+ma_len_60 = input.int(34, m60, 1,200,tooltip = ma_len_tt + m60, inline = "mins") 
+ma_len_16_59 = input.int(55, m16_59, 1,200,tooltip = ma_len_tt + m16_59, inline = "mixmins") 
+ma_len_61_240 = input.int(89, m61_240, 1,200,tooltip = ma_len_tt + m61_240, inline = "mixmins") 
+
+period = str.tonumber(timeframe.period)
+ma_len = if period == 5
+    ma_len_5
+else if period == 15
+    ma_len_15
+else if period == 60
+    ma_len_60
+else if period > 15 and period < 60
+    ma_len_16_59
+else if period > 60 and period <= 240
+    ma_len_61_240
+else
+    8
+
+// Question: How to pass values in ta.sma / ta.ema etc dynamically so that I can use it in other plot too ?
+ma_method = if ma == "SMA"
+    ta.sma(ma_src,ma_len)
+else if ma == "EMA"
+    ta.ema(ma_src,ma_len)
+else if ma == "WMA"
+    ta.wma(ma_src,ma_len)
+else if ma == "VWMA"
+    ta.vwma(ma_src,ma_len)
+else if ma == "RMA"
+    ta.rma(ma_src,ma_len)
+
+next_fib_len = math.floor(ma_len / 1.61)
+dema = ta.ema(ma_src,next_fib_len)
+isDoubleCondition = isDouble ? dema : na
+ma_fcolor = ma_src > dema ? color.lime : color.orange
+ma_color = ma_src > ma_method ? color.green : color.red
+
+//plot_title = ma + " Moving Average"  // Wanted to use plot_title in plot but got error 
+plot(ma_method, "Moving Average", ma_color, 2)
+plot(isDoubleCondition, "Fast Moving Average", ma_fcolor) //Multi color not working, why ?
+
+log.info(timeframe.period + "-" + str.tostring(period) + "\nS=> " + str.tostring(ma_len)
+ + " f=> " + str.tostring(next_fib_len) + " sC: " + str.tostring(ma_method) + " fC: " + str.tostring(dema))
+
+fill(plot(90), plot(91))

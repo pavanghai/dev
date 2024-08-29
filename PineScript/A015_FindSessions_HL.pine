@@ -1,0 +1,26 @@
+//@version=5
+indicator("A015 Find Sessions HL", overlay = true)
+ttLBB = "plot High Low line based on Number of look back  sessions"
+lookBackBars = input.int(2, "Session LookBackBars", tooltip = ttLBB)
+index = bar_index - ta.valuewhen(session.isfirstbar, bar_index, lookBackBars)
+candleCount = 0
+
+var float plotH = na
+var float plotL = na
+
+if session.isfirstbar //barstate.isfirst
+    High = high[1]
+    Low = low[1]
+    for i = 1 to index
+        if high[i] >= High
+            High := high[i]
+        if low[1] <= Low
+            Low :=low[1]
+    plotH := High
+    plotL := Low
+    log.warning(str.tostring(High))
+    log.info(str.tostring(index))
+
+plot(plotH, "Session High", color.red)
+plot(plotL, "Session Low", color.green)
+plot(index, "Index", color.blue, display = display.status_line)

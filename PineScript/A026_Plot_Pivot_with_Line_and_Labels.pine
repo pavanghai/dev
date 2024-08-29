@@ -1,0 +1,57 @@
+//@version=5
+indicator("A026 Plot Pivot with Line and Labels", overlay = true)
+
+RED    = #FF0000
+DRED   = #8B0000
+GREEN  = #008000
+DGREEN = #006400
+BLACK  = #000000
+WHITE  = #FFFFFF
+LGRAY  = #CCCCCC
+
+LABEL_DN = label.style_label_down
+LABEL_UP = label.style_label_up
+
+mtfSwitch = input.bool(true, "MTF On/Off", inline = "mtf")
+tf = input.timeframe("", "TimeFrame", inline = "mtf")
+
+pLen = input.int(10, "PivotPointLen",3,30, inline = "hisline")
+histSwitch = input.bool(true, "Historical On/Off", inline = "hisline")
+histLines = input.int(3, "Lines",1,20,inline = "hisline")
+
+lineSwitch = input.bool(true, "Lines On/Off ", inline = "onoff")
+lineNos = input.int(2, " SR lines", [1,2,3], inline = "onoff")
+labelSwitch = input.bool(true, "Labels On/Off", inline = "onoff")
+
+drawLabels(offSet, pPoint, style = label.style_label_left, bgCol = #FFFFFF) =>
+    if not na(pPoint)
+        label.new(x = bar_index[offSet], y = pPoint, text = str.tostring(pPoint, format.mintick)
+         , style=style, color = bgCol, textcolor = BLACK)
+        
+drawLines(offSet, pPoint, clr = #000000, width = 1) =>
+    if not na(pPoint)
+        line.new(x1 = bar_index[offSet], y1 = pPoint, x2 = bar_index, y2 = pPoint, color = clr, width = width)
+    
+ppH = ta.pivothigh(pLen, pLen)
+ppL = ta.pivotlow(pLen, pLen)
+
+[mTHLC3, mTC, mTT, MTTClo, mTpH, mTpL] = request.security("", tf, [hlc3, close, time, time_close, ppH, ppL])
+
+var line Line = na
+if labelSwitch
+    drawLabels(offSet = pLen, pPoint = ppH, style = LABEL_DN, bgCol = WHITE)
+    drawLabels(offSet = pLen, pPoint = ppL, style = LABEL_UP, bgCol = WHITE)
+
+if labelSwitch and mtfSwitch
+    drawLabels(offSet = pLen, pPoint = mTpH, style = LABEL_DN, bgCol = LGRAY)
+    drawLabels(offSet = pLen, pPoint = mTpL, style = LABEL_UP, bgCol = LGRAY)
+
+if lineSwitch
+    Line := drawLines(offSet = pLen, pPoint = ppH, clr = GREEN)
+    drawLines(offSet = pLen, pPoint = ppL, clr = RED)
+else
+    Line.set_x2(bar_index)
+
+if lineSwitch and  mtfSwitch
+    drawLines(offSet = pLen, pPoint = mTpH, clr = GREEN, width = 3)
+    drawLines(offSet = pLen, pPoint = mTpL, clr = RED, width = 3)

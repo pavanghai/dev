@@ -1,0 +1,19 @@
+//@version=5
+indicator("A017 Previous Day Volume match", overlay = true)
+plot(bar_index, display = display.status_line)
+Volume = request.security("", "D", volume[1])
+if barstate.islast
+    log.warning("\nPDayVolume: "+str.tostring(Volume, format.volume))
+    log.warning("\nNowVolume: "+str.tostring(volume, format.volume))
+volumeSum = volume
+i = 0
+while true
+    log.info("\nbar# " + str.tostring(bar_index) + "\nVolume: " +str.tostring(volume) + " SV: " + str.tostring(volumeSum))
+    if Volume >= volumeSum
+        log.error("ifblock" )
+        volumeSum += volume[i]
+    else
+        break
+    i += 1
+
+

@@ -1,0 +1,56 @@
+//@version=5
+indicator("A033 Array Pivot High Low with object N Function", overlay = true, max_labels_count = 500)
+//#region <inputs>
+len = input.int(10, "PivotLength", 3, 20)
+nLines = input.int(3, "Total Lines", 1, 20)
+//#endregion
+//#region <function_declarations>
+Shift(Array, Block = 2)=>
+    if Array.size() > Block
+        Array.shift()
+
+drawLine(x,y,color=#0000FF) =>
+    line.new(x, y, bar_index, y, color = color)
+
+lineLogic(allP, pLines, loc = "UP", color=#0000FF) =>
+    if allP.size() > 1
+        first = allP.first()
+        last = allP.last()
+        if loc == "UP" ? first.value > last.value : first.value < last.value
+            if not (pLines.size() > 0)
+                pLines.push(drawLine(first.loc, first.value, color))
+            if pLines.last().get_x1() != first.loc
+                pLines.push(drawLine(first.loc, first.value, color))
+        else
+            if pLines.size() > 0
+                pLines.last().set_x2(bar_index)
+//#endregion
+//#region <calculations>
+ph = ta.pivothigh(high, len, len)
+pl = ta.pivotlow(low, len, len)
+
+type Pivot
+    float value
+    int loc = bar_index
+
+var allPH = array.new<Pivot>()
+var allPL = array.new<Pivot>()
+
+if not na(ph)
+    allPH.push(Pivot.new(ph, bar_index-len))
+if not na(pl)
+    allPL.push(Pivot.new(pl, bar_index-len))
+
+Shift(allPH)
+Shift(allPL)
+
+var phLines = array.new<line>()
+var plLines = array.new<line>()
+//#endregion
+//#region <visuals>
+lineLogic(allPH, phLines, "UP", #FF0000)
+lineLogic(allPL, plLines, "DN", #00FF00)
+//#endregion
+
+if barstate.islast
+    log.info("\nHLine: "+ str.tostring(phLines.size()) + " LLine: "+ str.tostring(plLines.size()) )

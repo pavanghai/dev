@@ -1,0 +1,44 @@
+//@version=5
+indicator("A014-2 SuperTrend Breakout", "STB", overlay = true)
+stG = "Super Trend"
+stATR = input.int(10, "ATR Length", inline = "st", group = stG)
+stFactor = input.int(3, "factor", inline = "st", group = stG)
+traade = input.int(1, "# of Trades", group = stG)
+
+[supertrend, direction] = ta.supertrend(stFactor, stATR)
+stDirUp  = direction < 0
+stDirDwn = direction > 0
+
+stBdy = plot(hl2, "stbody", editable = false, display = display.none)
+stDwn = plot(stDirDwn ? supertrend : na , color=color.red, style = plot.style_linebr)
+stUP = plot(stDirUp ? supertrend : na , color=color.green, style = plot.style_linebr)
+
+fill(stUP, stBdy, color.new(color.green, 85), editable = false)
+fill(stDwn, stBdy, color.new(color.red, 85), editable = false)
+
+// sessionBarIndex = bar_index - ta.valuewhen(session.isfirstbar, bar_index,0)
+plot(bar_index, "bar index", color.olive, display = display.status_line)
+// plot(sessionBarIndex, "session bar index", color.orange, display = display.status_line)
+
+var float High = 0.0
+var float Low = 0.0
+if session.isfirstbar and stDirUp
+    High := high
+    Low := na
+if session.isfirstbar and stDirDwn
+    High := na
+    Low := low
+plotshape(session.isfirstbar, color=color.gray)
+plot(High, color=color.green, style = plot.style_linebr)
+plot(Low, color=color.red, style = plot.style_linebr)
+
+longCondition = ta.crossover(close, High)
+shortCondition = ta.crossunder(close, Low)
+
+plotshape(longCondition, color=color.green,text = "Buy", location = location.belowbar, textcolor = color.white, style = shape.labelup)
+plotshape(shortCondition, color=color.red, text = "Sell", location = location.abovebar, textcolor = color.white, style = shape.labeldown)
+
+if longCondition
+    High := na
+if shortCondition
+    High := na

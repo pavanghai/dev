@@ -1,0 +1,45 @@
+//@version=5
+indicator("A002-2 Moving Average Buy Sell signal","MABSS", overlay = true)
+
+//#region setup muving average
+src = input.source(close, "source", "Select source: open, high, low, close, etc")
+lenFE = input.int(8,"fast ema",tooltip = "Set moving average for fast ema")
+lenSE = input.int(13,"slow ema",tooltip = "Set moving average for slow ema")
+lenFS = input.int(26,"fast sma",tooltip = "Set moving average for fast sma")
+lenSS = input.int(89,"slow sma",tooltip = "Set moving average for slow sma")
+
+fast_ema = ta.ema(src, lenFE) 
+slow_ema = ta.ema(src, lenSE)
+fast_sma = ta.sma(src, lenFS) 
+slow_sma = ta.sma(src, lenSS)
+
+plot(fast_ema, "Fast EMA", color = color.lime, linewidth = 1)
+plot(slow_ema, "Slow EMA", color = color.blue, linewidth = 1)
+plot(fast_sma, "Fast SMA", color = color.orange, linewidth = 2)
+plot(slow_sma, "Slow SMA", color = color.maroon, linewidth = 2)
+//#endregion 
+
+//#region define v_bullish and v_bearish
+v_bullish = close > fast_ema 
+             and fast_ema > slow_ema 
+             and slow_ema > fast_sma 
+             and fast_sma > slow_sma
+v_bearish = close < fast_ema 
+             and fast_ema < slow_ema 
+             and slow_ema < fast_sma 
+             and fast_sma < slow_sma
+//#endregion
+bullish_crossover = ta.crossover(fast_ema, fast_sma) and fast_ema > slow_sma
+                     and close > fast_ema
+plotshape(bullish_crossover, style = shape.triangleup, location = location.belowbar,
+         color = color.green, size = size.small)
+bearish_crossunder = ta.crossunder(fast_ema, fast_sma) and fast_ema < slow_sma
+                     and close < fast_ema
+plotshape(bearish_crossunder, style = shape.triangledown, location = location.abovebar,
+         color = color.red, size = size.small)
+// sma_crossover = ta.cross(fast_sma, slow_sma)
+// plotchar(sma_crossover, char = "RSR") //Will print only 1 char
+// plotshape(sma_crossover, style = shape.diamond)  // Not required
+// plotshape(v_bullish, style = shape.arrowup, color = color.green, size = size.normal)
+// plotshape(v_bearish, style = shape.arrowdown, color = color.red, size = size.normal)
+log.info("Bar index: " + str.tostring(bar_index) + " - " + str.tostring((bar_index%2)>0))

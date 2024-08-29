@@ -1,0 +1,180 @@
+//@version=5
+indicator("A023 lines and Labels", overlay = true, max_lines_count = 250)
+//#region Assignment details 
+// Entry  Stop Loss (SL) Take Profit 1(TP1) Take Profit 2 (TP2) Take Profit 3 (TP3)
+// Provide an option to show or hide historical lines.
+// On reaching TP1, stop the TP1 line.  // On reaching TP2, stop the TP2 line. // On reaching TP3 or SL, stop all lines.
+//#endregion
+//#region input parameters and arguments
+msGrp = "Moving Average"
+isMa = input.bool(true, "sma ON|OFF", inline = "maS", group = msGrp)
+maTyp = input.string("SMA", "Type", ["SMA","EMA","WMA","VWMA","HMA"], inline = "maS", group = msGrp)
+isCross = input.bool(true, "plot 'X' for MA Cross", inline = "maS", group = msGrp)
+maSrc = input.source(close, "Source", inline = "ma", group = msGrp)
+maFast = input.int(50, "Fast", inline = "ma", group = msGrp)
+maSlow = input.int(100, "Slow", inline = "ma", group = msGrp)
+brColor = input.bool(true, "bullish Bearish zone") 
+isHist = input.bool(true, "Historical Lines")
+setGrp = "STOP ENTRY TARGET (SET)"
+perPtTT = "tick to calculation in points and untick for percent | Stop is points or Percent away from Entry"
+     +" | target is multiplier number based on Entry Price in relation to STOP Price"
+isLine = input.bool(true, "Draw SET Lines", inline = "LPP", group = setGrp)
+isPt = input.bool(false, "Points ON | Percent OFF", perPtTT, "LPP", setGrp)
+mltTgt = input.bool(true, "MltTarget", perPtTT, "LPP", setGrp)
+stop = input.float(1.0, "Stop", inline = "perPt", group = setGrp)
+entry = input.source(close, "Entry", inline = "perPt", group = setGrp)
+target = input.float(1.5, "target", inline = "perPt", group = setGrp)
+//#endregion
+//#region switch for moving average with plotting, background Color 
+float fastMA = switch maTyp
+    "SMA"  => ta.sma(maSrc, maFast)
+    "EMA"  => ta.ema(maSrc, maFast)
+    "WMA"  => ta.wma(maSrc, maFast)
+    "VWMA" => ta.vwma(maSrc, maFast)
+    "HMA"  => ta.hma(maSrc, maFast)
+float slowMA = switch maTyp
+    "SMA"  => ta.sma(maSrc, maSlow)
+    "EMA"  => ta.ema(maSrc, maSlow)
+    "WMA"  => ta.wma(maSrc, maSlow)
+    "VWMA" => ta.vwma(maSrc, maSlow)
+    "HMA"  => ta.hma(maSrc, maSlow)
+plot(isMa ? fastMA : na, "Fast MA", color.lime)
+plot(isMa ? slowMA : na, "Slow MA", color.orange)
+
+long = ta.crossover(fastMA, slowMA)
+short = ta.crossunder(fastMA, slowMA)
+plotshape(isCross ? long : na, "Long", color =  color.lime, size = size.small, display = display.pane)
+plotshape(isCross ? short : na, "Short", color = color.orange, size = size.small, display = display.pane)
+
+var inLong = false
+var inShort = false
+if long
+    inLong := true
+    inShort := false
+if short
+    inLong := false
+    inShort := true
+bgcolor(inLong ? color.new(color.green, 95) : inShort ? color.new(color.red,95) : color.new(color.yellow,95))
+//#endregion
+
+slVal = isPt ? stop : entry * (stop/100)
+tgtVal = slVal * target
+
+//#region SET Lines logic
+var line stLine = na
+var line entLine = na
+var line tgt1Line = na
+var line tgt2Line = na
+var line tgt3Line = na
+
+var label stLabel = na
+var label entLabel = na
+var label tgt1Label = na
+var label tgt2Label = na
+var label tgt3Label = na
+
+var isTgt1LE = false
+var isTgt2LE = false
+var isTgt3LE = false
+var isSlLE = false
+
+if isLine and (long or short)
+    y_sl = 0.0
+    y_tgt1 = 0.0
+    y_tgt2 = 0.0
+    y_tgt3 = 0.0
+    isTgt1LE := true
+    isTgt2LE := true
+    isTgt3LE := true
+    isSlLE := true
+    
+    if long
+        y_sl := entry - slVal
+        y_tgt1 := entry + (slVal * target)
+        y_tgt2 := entry + (slVal * target * 2)
+        y_tgt3 := entry + (slVal * target * 3)
+    if short
+        y_sl := entry + slVal
+        y_tgt1 := entry - (slVal * target)
+        y_tgt2 := entry - (slVal * target * 2)
+        y_tgt3 := entry - (slVal * target * 3)
+
+    log.warning("\nEntry: " + str.tostring(entry) 
+         + "\nRisk: " + str.tostring(slVal) + " Reward: " + str.tostring(slVal * target)
+         + "\nStop: " + str.tostring(y_sl) + "\Target: " + str.tostring(y_tgt1))
+    stLine := line.new(bar_index, y_sl, bar_index + 10, y_sl, color = color.red, width = 3)
+    entLine := line.new(bar_index, entry, bar_index + 10, entry, color = color.blue, width = 2)
+    tgt1Line := line.new(bar_index,y_tgt1, bar_index + 10, y_tgt1, color = color.lime, width = 3)
+
+    stLabel := label.new(bar_index,y_sl, "Stop", color = color.new(color.red, 70), style = label.style_label_left)
+    entLabel := label.new(bar_index,entry, "Entry", color = color.new(color.blue, 70), style = label.style_label_left)
+    tgt1Label := label.new(bar_index,y_tgt1, "Target 1", color = color.new(color.green, 70), style = label.style_label_left)
+    linefill.new(stLine,entLine, color.new(color.red, 70))
+    linefill.new(tgt1Line,entLine, color.new(color.green, 70))
+
+    if mltTgt
+        tgt2Line := line.new(bar_index,y_tgt2, bar_index + 10, y_tgt2, color = color.green, width = 3)
+        tgt3Line := line.new(bar_index,y_tgt3, bar_index + 10, y_tgt3, color = color.olive, width = 3)
+        linefill.new(tgt1Line,tgt2Line, color.new(color.green, 40))
+        linefill.new(tgt3Line,tgt2Line, color.new(color.green, 5))
+        tgt2Label := label.new(bar_index,y_tgt2, "Target 2", color = color.new(color.green, 40), style = label.style_label_left)
+        tgt3Label := label.new(bar_index,y_tgt3, "Target 3", color = color.new(color.green, 5), style = label.style_label_left)        
+
+    if not isHist
+        line.delete(stLine[1])
+        line.delete(entLine[1])
+        line.delete(tgt1Line[1])
+        line.delete(tgt2Line[1])
+        line.delete(tgt3Line[1])
+        label.delete(stLabel[1])
+        label.delete(entLabel[1])
+        label.delete(tgt1Label[1])
+        label.delete(tgt2Label[1])
+        label.delete(tgt3Label[1])
+else
+    if isSlLE //or isTgt3LE
+        stLine.set_x2(bar_index)
+        entLine.set_x2(bar_index)
+        stLabel.set_x(bar_index)
+        entLabel.set_x(bar_index)
+        
+        if isTgt1LE
+            tgt1Line.set_x2(bar_index)
+            tgt1Label.set_x(bar_index)
+        if isTgt2LE
+            tgt2Line.set_x2(bar_index)
+            tgt2Label.set_x(bar_index)
+        if isTgt3LE
+            tgt3Line.set_x2(bar_index)
+            tgt3Label.set_x(bar_index)
+
+    if isTgt1LE
+        tgt1Line.set_x2(bar_index)
+        tgt1Label.set_x(bar_index)
+    if isTgt2LE
+        tgt2Line.set_x2(bar_index)
+        tgt2Label.set_x(bar_index)
+
+    if isTgt3LE
+        tgt3Line.set_x2(bar_index)
+        stLine.set_x2(bar_index)
+        entLine.set_x2(bar_index)
+        tgt3Label.set_x(bar_index)
+        stLabel.set_x(bar_index)
+        entLabel.set_x(bar_index)
+
+if (ta.crossover(close, stLine.get_y1()) and inShort) or (ta.crossunder(close, stLine.get_y1()) and inLong)
+    isSlLE := false
+    isTgt1LE := false
+    isTgt2LE := false
+    isTgt3LE := false
+
+if (ta.crossover(close, tgt1Line.get_y1()) and inLong) or (ta.crossunder(close, tgt1Line.get_y1()) and inShort)
+    isTgt1LE := false
+
+if (ta.crossover(close, tgt2Line.get_y1()) and inLong) or (ta.crossunder(close, tgt2Line.get_y1()) and inShort)
+    isTgt2LE := false
+
+if (ta.crossover(close, tgt3Line.get_y1()) and inLong) or (ta.crossunder(close, tgt3Line.get_y1()) and inShort)
+    isTgt3LE := false
+    isSlLE := false

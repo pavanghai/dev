@@ -1,0 +1,62 @@
+//@version=5
+indicator("A019-3 Bollinger Band + CCI")
+//#region Input section for Bollinger band and CCI Indicator
+bb_src = input.source(close, "Source", inline = "BB")
+bb_len = input.int(20, "Length", inline = "BB")
+bb_dev = input.int(2, "StdDev", inline = "BB")
+cci_src = input.source(hlc3, "CCI Source", inline = "cci")
+cci_len = input.int(20, "Length", inline = "cci")
+bb_cci = input.bool(true, "Signal using CCI on BB", inline = "bbcci")
+cci_ind = input.bool(true, "CCI Indicator", inline = "bbcci")
+//#endregion
+
+//#region Bollinger band ploting and conditions
+[bb_mid, bb_up, bb_dn] = ta.bb(bb_src, bb_len, bb_dev)
+bb_up_p = plot(bb_up, "BB Up", color.red, force_overlay = true)
+bb_mid_p = plot(bb_mid, "BB Mid", color.blue, force_overlay = true)
+bb_dn_p = plot(bb_dn, "BB dn", color.green, force_overlay = true)
+fill(bb_up_p, bb_mid_p, color.new(color.red, 95))
+fill(bb_dn_p, bb_mid_p, color.new(color.green, 95))
+
+is_x_bb_up = ta.crossover(high, bb_up)
+is_x_bb_dn = ta.crossunder(low, bb_dn)
+is_x_bb_mid = ta.cross(close, bb_mid)
+plotshape(is_x_bb_up, text = "Band", textcolor = color.red, location = location.abovebar, force_overlay = true)
+plotshape(is_x_bb_dn, text = "Band", textcolor = color.green, location = location.belowbar, force_overlay = true)
+//#endregion
+
+//#region CCI ploting and conditions
+plot(cci_ind ? 100 : na, color = color.red, editable = false, force_overlay = false)
+plot(cci_ind ? 0 : na, color = color.gray, editable = false, force_overlay = false)
+plot(cci_ind ? -100 : na, color = color.green, editable = false, force_overlay = false)
+cci = ta.cci(cci_src, cci_len)
+plot(cci_ind ? cci: na, force_overlay = false, display = display.pane)
+
+is_cci_p = cci > 0 and bb_cci
+is_cci_n = cci < 0 and bb_cci
+//#endregion
+//#region BB and CCI signal logic
+var bandG = false
+if is_x_bb_dn
+    bandG := true
+plotshape(is_x_bb_mid and bandG ? low: na, color = color.green, style = shape.labelup,
+ text = "Buy", textcolor = color.white, location = location.belowbar, force_overlay = true)
+
+plotshape(is_x_bb_mid and bandG and is_cci_p ? low: na, color = color.olive, style = shape.labelup,
+ text = "C-Buy", textcolor = color.white, location = location.belowbar, force_overlay = true)
+if is_x_bb_mid
+    bandG := false
+
+var bandR = false
+if is_x_bb_up
+    bandR := true
+plotshape(is_x_bb_mid and bandR ? high: na, color = color.red, style = shape.labeldown,
+ text = "Sell", textcolor = color.white, location = location.abovebar, force_overlay = true)
+
+plotshape(is_x_bb_mid and bandR and is_cci_n ? high: na, color = color.maroon, style = shape.labeldown,
+ text = "C-Sell", textcolor = color.white, location = location.abovebar, force_overlay = true)
+if is_x_bb_mid
+    bandR := false
+//#endregion
+if barstate.islast
+    log.warning("\n P " + str.tostring(is_cci_p) + " N " + str.tostring(is_cci_n))

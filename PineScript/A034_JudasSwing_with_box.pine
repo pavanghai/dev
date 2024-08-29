@@ -1,0 +1,71 @@
+//@version=5
+indicator("A034 Judas Swing with box", overlay = true, max_boxes_count = 500, max_labels_count = 500, max_lines_count = 500)
+nBox  = input.int(50, "Boxes", inline = "per")
+nrPer = input.float(0.001, "near", 0.000, 2, 0.0005, "0.01 = 1.00%, 0.0025 = 0.25%", "per")
+frPer = input.float(0.003, "far", 0.000, 2, 0.0005, "0.01 = 1.00%, 0.0025 = 0.25%", "per")
+
+upBCol = color.new(#FF0000, 80)
+dnBCol = color.new(#00FF00, 80)
+
+type bLoc
+    float H  = high
+    float H1 = high
+    float H2 = high
+    float L  = low
+    float L1 = low
+    float L2 = low
+    int   B  = bar_index
+
+var allPrice = array.new<bLoc>(nBox, bLoc.new())
+var allBox = array.new<box>(nBox, box.new(bar_index,high, bar_index+2, high*(1.01))) // Not used and not sure how to use
+var box hBox = na
+var box lBox = na
+var dBox     = true //default box
+var isInHBox = false
+var isInLBox = false
+
+
+if session.isfirstbar
+    allPrice.push(bLoc.new(H1 = high * (1+nrPer), H2 = high * (1+frPer), L1 = low * (1-nrPer), L2 = low * (1-frPer)))
+    allPrice.shift()
+    hBox := box.new(allPrice.last().B, allPrice.last().H1, bar_index+2, allPrice.last().H2, bgcolor = upBCol, border_color = na )
+    lBox := box.new(allPrice.last().B, allPrice.last().L1, bar_index+2, allPrice.last().L2, bgcolor = dnBCol, border_color = na )
+    line.new(bar_index, high, bar_index+22, high, color = #FF0000)
+    line.new(bar_index, low, bar_index+22, low, color = #00FF00)
+
+    uBStr = "H: " + str.tostring(allPrice.last().H, format.mintick) + " H1: "
+     + str.tostring(allPrice.last().H1, format.mintick) + " H2: " +str.tostring(allPrice.last().H2, format.mintick)
+    label.new(bar_index, allPrice.last().H2, uBStr, color = #999999, style = label.style_label_lower_left)
+
+    dBStr = "L: " + str.tostring(allPrice.last().L, format.mintick) + " L1: "
+     + str.tostring(allPrice.last().L1, format.mintick) + " L2: " +str.tostring(allPrice.last().L2, format.mintick)
+     + " ASz: " + str.tostring(allPrice.size())
+    label.new(bar_index, allPrice.last().L2, dBStr, color = #999999, style = label.style_label_upper_left)
+else
+    if dBox
+        hBox.set_right(bar_index)
+        lBox.set_right(bar_index)
+    
+if session.islastbar  //RESET all switches (bool values)
+    dBox     := true
+    isInHBox := false
+    isInLBox := false
+
+isCoH1 = ta.crossover(close, allPrice.last().H1)
+isCoH2 = ta.crossover(close, allPrice.last().H2)
+isCuL1 = ta.crossunder(close, allPrice.last().L1)
+isCuL2 = ta.crossunder(close, allPrice.last().L2)
+
+if isCoH1
+    isInHBox := true
+isCuH = isInHBox and ta.crossunder(close, allPrice.last().H)
+
+if isCuL1
+    isInLBox := true
+isCoL = isInLBox and ta.crossover(close, allPrice.last().L)
+
+if isCoH2 or isCuH or isCuL2 or isCoL
+    dBox:= false
+
+plotshape(isCoH1, style = shape.square)
+plotshape(isCuH, style = shape.arrowdown)

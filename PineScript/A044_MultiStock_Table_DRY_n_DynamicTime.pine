@@ -1,0 +1,142 @@
+//@version=5
+indicator("A044 Multi Stock Table DRY n DynamicTime", overlay = true)
+//#region input
+tf1 = input.timeframe("15", "TimeFrame1-2", inline = "tf1-2")
+tf2 = input.timeframe("60", "", inline = "tf1-2")
+position = switch input.string("Top Right", "Position",
+     ["Top Right", "Top Center", "Top Left", "Middle Right", "Middle Center", "Middle Left","Bottom Right", "Bottom Center", "Bottom Left"])
+    "Top Right"     => position.top_right     , 
+    "Top Center"    => position.top_center    ,
+    "Top Left"      => position.top_left      , 
+    "Middle Right"  => position.middle_right  , 
+    "Middle Center" => position.middle_center ,   
+    "Middle Left"   => position.middle_left   ,
+    "Bottom Right"  => position.bottom_right  ,
+    "Bottom Center" => position.bottom_center , 
+    "Bottom Left"   => position.bottom_left
+bgColor = input.color(#dfe1e8, "Board Color", inline = "tblCol")
+borderColor = input.color(#000000, "Border Color", inline = "tblCol")
+textSize = switch input.string("Normal", "Table Size", ["Auto", "Tiny", "Small", "Normal", "Large", "Huge"])
+    "Auto"   => size.auto   , 
+    "Tiny"   => size.tiny   , 
+    "Small"  => size.small  , 
+    "Normal" => size.normal ,
+    "Large"  => size.large  , 
+    "Huge"   => size.huge
+// symStr = input.text_area("NASDAQ:AAPL,NASDAQ:NVDA,NASDAQ:MSFT,NASDAQ:GOOG,NASDAQ:GOOGL", "Symbol List")
+symStr = "NASDAQ:AAPL,NASDAQ:NVDA,NASDAQ:MSFT,NASDAQ:GOOG,NASDAQ:GOOGL,NASDAQ:INTC,NASDAQ:BAC"
+getSymArray = str.split(symStr, ",")
+
+isSym1 = input.bool(true, "", inline = "sym1")
+sym1   = input.symbol("NASDAQ:AAPL", "Sym1", inline = "sym1")
+isSym2 = input.bool(true, "", inline = "sym2")
+sym2   = input.symbol("NASDAQ:NVDA", "Sym2", inline = "sym2")
+isSym3 = input.bool(true, "", inline = "sym3")
+sym3   = input.symbol("NASDAQ:MSFT", "Sym3", inline = "sym3")
+isSym4 = input.bool(true, "", inline = "sym4")
+sym4   = input.symbol("NASDAQ:GOOG", "Sym4", inline = "sym4")
+isSym5 = input.bool(true, "", inline = "sym5")
+sym5   = input.symbol("NASDAQ:AMZN", "Sym5", inline = "sym5")
+isSym6 = input.bool(true, "", inline = "sym6")
+sym6   = input.symbol("NASDAQ:META", "Sym6", inline = "sym6")
+isSym7 = input.bool(true, "", inline = "sym7")
+sym7   = input.symbol("NASDAQ:AVGO", "Sym7", inline = "sym7")
+isSym8 = input.bool(true, "", inline = "sym8")
+sym8   = input.symbol("NASDAQ:TSLA", "Sym8", inline = "sym8")
+isSym9 = input.bool(true, "", inline = "sym9")
+sym9   = input.symbol("NASDAQ:NFLX", "Sym9", inline = "sym9")
+isSym10 = input.bool(true, "", inline = "sym10")
+sym10   = input.symbol("NASDAQ:TEAM", "Sym10", inline = "sym10")
+//#endregion
+
+tfStr(str) =>
+    //Convert num string to symbol string
+    if not (str.contains(str,"D") or str.contains(str,"W") or str.contains(str,"M"))
+        DurMins = str.tonumber(str)
+        if DurMins >= 60
+            Hrs = int(DurMins / 60)
+            BalMins = DurMins % 60
+            // log.error(str.tostring(BalMins))
+            if BalMins > 0
+                Dur = str.tostring(Hrs) + "H" + str.tostring(BalMins) + "M"
+            else
+                Dur = str.tostring(Hrs) + "H"
+        else
+            Dur = str.tostring(DurMins) + "Min."
+    else
+        str
+
+sF(price, format = "MinTick") =>
+    if format == "MinTick"
+        str.tostring(price, format.mintick)
+    else
+        str.tostring(price, format.percent)       
+
+getColor(price) =>
+    price > 0 ? #00FF00 : #FF0000
+
+getSym(sym) =>
+    if sym != ""
+        str.split(sym, ":").last()
+    else
+        syminfo.ticker
+
+method row(table this, sym, row) =>
+    lCng = close - close[1]
+    lCngP = (close - close[1]) / close[1] * 100 
+    [ltp, ltpChg, ltpChgPer] = request.security(sym, "", [close, lCng, lCngP])
+    ltpChgPerT1 = request.security(sym, tf1, lCngP)
+    ltpChgPerT2 = request.security(sym, tf2, lCngP)
+
+    bg_color = getColor(ltpChg)
+    this.cell(0,row, getSym(sym), text_size = textSize)
+    // this.cell(1,row, str.tostring(ltp, format.mintick), text_size = textSize, bgcolor = bg_color)
+    this.cell(1,row, sF(ltp), text_size = textSize, bgcolor = bg_color)
+    this.cell(2,row, sF(ltpChg), text_size = textSize, bgcolor = bg_color)
+    // this.cell(3,row, str.tostring(ltpChgPer, format.percent), text_size = textSize, bgcolor = bg_color)
+    this.cell(3,row, sF(ltpChgPer, "P"), text_size = textSize, bgcolor = bg_color)
+    this.cell(4,row, sF(ltpChgPerT1, "P"), text_size = textSize, bgcolor = getColor(ltpChgPerT1))
+    this.cell(5,row, sF(ltpChgPerT2, "P"), text_size = textSize, bgcolor = getColor(ltpChgPerT2))
+    
+
+if barstate.islast
+    // log.warning(str.tostring(getSymArray.size())+getSymArray.last())
+    // log.warning(tfStr(tf2))
+    // log.info(str.tostring(getSymArray.get(5)))
+    board = table.new(position, 7,15, bgColor, border_color = borderColor,border_width = 1)
+    board.cell(0,0,"Stock Price"  ,bgcolor = #000000, text_color = #FFFFFF, text_size = textSize)
+    board.merge_cells(0,0,5,0)
+    board.cell(0,1,"Symbol"  ,text_size = textSize)
+    board.cell(1,1,"LTP"     ,text_size = textSize)
+    board.cell(2,1,"Change"  ,text_size = textSize)
+    board.cell(3,1,"Change %",text_size = textSize)
+    board.cell(4,1,tfStr(tf1) + " Chg %",text_size = textSize)
+    board.cell(5,1,tfStr(tf2) + " Chg %" ,text_size = textSize)
+
+    board.row("", 2)
+    // How to use this in loop ?
+    if isSym1
+        board.row(sym1, 1+2)
+    if isSym2
+        board.row(sym2, 2+2)
+    if isSym3
+        board.row(sym3, 3+2)
+    if isSym4
+        board.row(sym4, 4+2)
+    if isSym5
+        board.row(sym5, 5+2)
+    if isSym5
+        board.row(sym5, 5+2)
+    if isSym6
+        board.row(sym6, 6+2)
+    if isSym7
+        board.row(sym7, 7+2)
+    if isSym8
+        board.row(sym8, 8+2)
+    if isSym9
+        board.row(sym9, 9+2)
+    if isSym10
+        board.row(sym10, 10+2)
+    // board.row(str.tostring(getSymArray.get(5)), 11+2)
+    
+plot(close)

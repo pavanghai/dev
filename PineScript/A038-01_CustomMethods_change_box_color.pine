@@ -1,0 +1,29 @@
+//@version=5
+indicator("A038-01 Custom Methods change box color", overlay = true)
+
+type Gap
+    bool isActive
+    box channel
+
+var allBox = array.new<Gap>()
+
+method Close(Gap item, index) => 
+    item.channel.set_right(bar_index)
+    if (high > item.channel.get_top() or low < item.channel.get_bottom())
+        allBox.remove(index)
+
+method decorate(box bCol, color = #FFFF00, txt = "") =>
+    bCol.set_bgcolor(color)
+    bCol.set_text(txt)
+
+
+if session.isfirstbar
+    BOX = box.new(bar_index, high, bar_index+5, low)
+    BOX.decorate()
+    allBox.push(Gap.new(isActive = true, channel = BOX))
+for [index,gap] in allBox
+    gap.Close(index)
+    if high > gap.channel.get_top()
+        gap.channel.decorate(#00FF00, "Bull")
+    if low < gap.channel.get_bottom()
+        gap.channel.decorate(#FF0000, "Bear")

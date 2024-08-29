@@ -1,0 +1,139 @@
+//@version=5
+indicator("A011 SuperTrend + Stoch Buy sell + 4 Moving Avg + boaring/explosive candle", "D10STSMAEB", 
+     max_bars_back = 10) // What is max_bars_back for?
+//#region SuperTrend
+// User Input
+st_grp = "---Super Trend---"
+is_st_tt = "ON/OFF Untick to deactivate Supertrend (Default is ticked to ON) "
+sto_sig_tt = is_st_tt + " Tick to activate signal on Stochastic. Note: will work only if Supertrend is active"
+is_st = input.bool(true, "Supertrend", is_st_tt, inline = "ststo", group = st_grp)
+is_sto_sig = input.bool(false, "STOCH Signal", sto_sig_tt, inline = "ststo", group = st_grp)
+st_tt_ss = "Select SuperTrend drawing pattern and trading signal"
+st_style = input.string("line", "Style", ["line","circles", "cross"], "Select style", inline = "st",group = st_grp)
+st_signal = input.string("Both", "Signal on", ["Buy","Sell", "Both"], st_tt_ss, inline = "st", group = st_grp)
+
+st_tt = "Multiplier factor and ATR calculate to be used for Supertrend"
+st_factor = input.int(3, "Multiplier", inline = "supertrend", group = st_grp)
+st_atr = input.int(10, "ATR", inline = "supertrend", group = st_grp, tooltip = st_tt)
+
+// calculation and ploting
+st_styl = switch st_style
+    "line"    => plot.style_linebr
+    "circles" => plot.style_circles
+    "cross"   => plot.style_cross
+
+[supertrend, direction] = ta.supertrend(st_factor, st_atr)
+st_up_cond = direction < 0 and is_st
+st_dn_cond = direction > 0 and is_st
+st_p1 = plot(st_up_cond ? low : st_dn_cond ? high : na, force_overlay = true, display = display.none, editable = false)
+
+st_p_up = plot(st_up_cond ? supertrend : na, "Up direction", color = color.green, style=st_styl,
+         editable = false, force_overlay = true)
+st_p_dn = plot(st_dn_cond ? supertrend : na, "Down direction", color = color.red, style=st_styl,
+         editable = false, force_overlay = true)
+fill(st_p1,st_p_up, color.new(#4CAF50,85), editable = false)
+fill(st_p1,st_p_dn, color.new(#FF5252,85), editable = false)
+// Question, How to merge both fills ?
+//#endregion
+//#region Super trend trade signal
+/////////////// Buy Signal ////////////////////
+// var valid_st_buy = true
+// if st_dn_cond
+//     valid_st_buy := true
+
+// plot_st_buy = st_up_cond and valid_st_buy and is_st
+plot_st_buy = st_up_cond and not st_up_cond[1] and is_st
+plotshape(plot_st_buy and (st_signal == "Both" or st_signal == "Buy") ? supertrend : na, title = "st_buy", 
+         style = shape.labelup, location = location.absolute, color = color.green, text = "BUY", 
+         textcolor = color.white, editable = false, force_overlay = true)
+plotshape(plot_st_buy and st_signal == "Sell" ? supertrend : na, title = "st_buy", style = shape.labelup,
+         location = location.absolute, color = color.green, text = "BUY To Close", 
+         textcolor = color.white, editable = false, force_overlay = true)
+// if st_up_cond and valid_st_buy
+//     valid_st_buy := false
+
+/////////////// Sell Signal ////////////////////
+// var valid_st_sell = true
+// if st_up_cond
+//     valid_st_sell := true
+
+// plot_st_sell = st_dn_cond and valid_st_sell and is_st
+plot_st_sell = st_dn_cond and not st_dn_cond[1] and is_st
+plotshape(plot_st_sell and (st_signal == "Both" or st_signal == "Sell") ? supertrend : na, title = "st_sell",
+         style = shape.labeldown, location = location.absolute, color = color.red, text = "SELL",
+         textcolor = color.white, editable = false, force_overlay = true)
+plotshape(plot_st_sell and st_signal == "Buy" ? supertrend : na, title = "st_sell", style = shape.labeldown,
+         location = location.absolute, color = color.red, text = "SELL to Close", textcolor = color.white,
+         editable = false, force_overlay = true)
+// if st_dn_cond and valid_st_sell
+//     valid_st_sell := false
+//Question: I was getting issues while using above if block before plot, need explanation 
+//#endregion
+
+//#region Stochastic 
+// User Input
+sto_grp = "---Stochastic---"
+sto_tt = "Tick to activate Stochastic(Default is ticked)" // and select trade signal on Buy/Sell/Both"
+is_sto = input.bool(true, "Stochastic : - ",sto_tt, inline = "sto", group = sto_grp)
+
+is_sto_tt = " and select trade signal on Buy/Sell/Both"
+sto_tool_tip = "Stochastic(stoch) Oscillator: fast stoch line and slow stoch line"
+// sto_signal = input.string("Buy", "Signal on", ["Buy","Sell", "Both"],sto_tt+is_sto_tt,inline = "sto",group = sto_grp)
+sto_period  = input.int(20, title="%K Length", minval=1, inline = "stoch", group = sto_grp)
+sto_p_smooth  = input.int(10, title="%K smooth", minval=1, inline = "stoch", group = sto_grp)
+sto_smooth  = input.int(4, title="%d Smoothing", minval=1, inline = "stoch", group = sto_grp, tooltip = sto_tool_tip)
+
+sto_tt_line = "Over Bought / Sold"
+sto_ob = input.int(20, title="Over Bought", minval=1, inline = "sline", group = sto_grp)
+sto_os = input.int(80, title="Over Sold", minval=1, inline = "sline", group = sto_grp, tooltip = sto_tt_line)
+
+// calculation and ploting
+sto_k = ta.sma(ta.stoch(close,high,low,sto_period),sto_p_smooth)
+sto_d = ta.sma(sto_k,sto_smooth)
+
+ob_line = plot(is_sto ? sto_ob : na, "Over bought",color.red, editable = false)
+os_line = plot(is_sto ? sto_os : na, "Over Sold", color.green, editable = false)
+fill(ob_line, os_line, color.new(color.blue, 95),editable = false)
+c_line = plot(is_sto ? 50 : na, "center line",color.black, editable = false)
+plot(is_sto ? sto_k : na, "Fast Line", color.blue, trackprice = true)
+plot(is_sto ? sto_d : na, "Slow Line", color.aqua,2)
+//#endregion
+//#region Stochastic Buy and sell signal 
+sto_f_over_s = ta.crossover(sto_k, sto_d) and st_up_cond and is_st and is_sto_sig
+plotshape(sto_f_over_s ? supertrend : na, title = "sto_buy", style = shape.labelup, location = location.absolute,
+         color = color.green, text = "B", textcolor = color.white, editable = false, force_overlay = true)
+
+sto_f_under_s = ta.crossunder(sto_k, sto_d) and st_dn_cond and is_st and is_sto_sig
+plotshape(sto_f_under_s ? supertrend : na, title = "sto_sell", style = shape.labeldown, location = location.absolute,
+         color = color.red, text = "S", textcolor = color.white, editable = false, force_overlay = true)
+//#endregion
+//#region input values with ploting for 2 SMA and 2 EMA
+sema_grp = "---SMA and EMA---"
+is_sema =  input.bool(false, "Fast and Slow SMA-EMA : - ", inline = "sema", group = sema_grp)
+sema_src = input.source(defval = close, title = ' source', inline = "sema", group = sema_grp) 
+fsma = input.int(defval = 8, title = "Fast SMA", inline = "s_ma", group = sema_grp)
+ssma = input.int(defval = 13, title = "Slow SMA", inline = "s_ma", group = sema_grp)
+fema = input.int(defval = 26, title = "Fast EMA", inline = "e_ma", group = sema_grp)
+sema = input.int(defval = 89, title = "Slow EMA", inline = "e_ma", group = sema_grp)
+
+plot(is_sema ? ta.sma(sema_src, fsma) : na, "Fast SMA", color.lime, force_overlay = true)
+plot(is_sema ? ta.sma(sema_src, ssma) : na, "Slow SMA", color.blue, force_overlay = true)
+plot(is_sema ? ta.ema(sema_src, fema) : na, "Fast EMA", color.orange, force_overlay = true)
+plot(is_sema ? ta.ema(sema_src, sema) : na, "Slow EMA", color.maroon, force_overlay = true)
+//#endregion
+//#region Boaring and Explosive Candles
+is_boaring  = input.bool(true, "Boaring Candle : - ", inline = "c_b")
+c_body_ratio = input.float(0.40, " Body",minval=0.20, maxval=1, step = 0.10, inline = "c_b")
+c_body = math.abs(open-close)
+c_range = math.abs(high-low)
+c2b_ratio = c_body/c_range
+barcolor(c2b_ratio <= c_body_ratio and is_boaring ? color.yellow : na, editable = false)
+
+is_explo  = input.bool(true, "Explosive Candle : - ", inline = "c_e")
+mp = input.float(2.0, " Multiplier", minval=1, maxval=5, step = 0.25, inline = "c_e")
+ratio = input.float(0.50, "Body", minval=0.20, maxval=5, step = 0.10, inline = "c_e_ba")
+avg_cdl = input.int(100, title="Average candles", inline = "c_e_ba")
+
+c_atr = ta.atr(avg_cdl)
+barcolor(c2b_ratio>=ratio and c_range>=(c_atr*mp) and is_explo ? color.navy:na, title="Explosive Move")
+//#endregion

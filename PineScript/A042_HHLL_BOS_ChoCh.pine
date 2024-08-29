@@ -1,0 +1,39 @@
+//@version=5
+//REF: https://youtu.be/VQ4_-ugTyrs?si=6sPKl75B1Yt-Zwju
+indicator("A042 HHLL not complete", overlay = true)
+var HIGH = high
+var HIGH1 = high
+var HIGH2 = high
+var biH = bar_index
+var biH1 = bar_index
+var biH2 = bar_index
+var biL = bar_index
+var HLRange = false
+var LOW = low
+var LOW1 = low
+var LOW2 = low
+var mid = 0.0
+var lockHigh = false
+L = label.new(biL, LOW, "L", style = label.style_label_upper_right ,textcolor = #FFFFFF)
+H = label.new(biH, HIGH, "H", style = label.style_label_lower_right ,textcolor = #FFFFFF)
+if high > high[1] and high > HIGH1
+    HIGH1 := high
+    biH1 := bar_index
+    mid := (HIGH1 - ((HIGH1 - LOW) * 0.38))
+else if low <= mid //(HIGH1 - ((HIGH1 - LOW) * 0.38))
+    HLRange := true
+    HIGH2 := HIGH1
+    biH2 := biH1
+    LOW1 := low
+    log.warning("\nH1: "+str.tostring(HIGH1) + " L:"+str.tostring(LOW)+ " m:"+str.tostring(mid) + " h:"+str.tostring(high)+ " l:"+str.tostring(low))
+
+if HLRange and high > HIGH2
+    log.error("\nBOS: " + str.tostring(HIGH2) + " L:" + str.tostring(LOW1))
+    HH = label.new(biH2, HIGH2, "HH:"+str.tostring(HIGH2), style = label.style_label_lower_right ,textcolor = #FFFFFF)
+
+    
+if barstate.islast
+    label.new(bar_index,high, str.tostring(HIGH1), textcolor = #FFFFFF)
+
+log.info("\nH1: "+str.tostring(HIGH1)+" H:"+str.tostring(high))
+plot(close)

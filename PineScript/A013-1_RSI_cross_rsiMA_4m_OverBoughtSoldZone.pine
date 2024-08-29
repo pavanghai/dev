@@ -1,0 +1,50 @@
+//@version=5
+indicator("A013-1 RSI cross rsiMA from over bought/sold zone",shorttitle = "RSI Sig")
+//#region RSI Input and Ploating 
+r_grp = "--Relative Strength Index(RSI)--"
+isr_sig = input.bool(true, "Buy Sell signal : - ",inline = "rsi", group = r_grp)
+r_src = input.source(close, "Source", inline = "rsi", group = r_grp)
+r_len = input.int(14, "Period", inline = "rsi_param", group = r_grp)
+r_ma = input.int(14, "Smooth", inline = "rsi_param", group = r_grp)
+r_ob = input.int(70, "Overbought", inline = "rsi_over", group = r_grp)
+r_os = input.int(30, "Oversold", inline = "rsi_over", group = r_grp)
+
+r_period = ta.rsi(r_src, r_len)
+r_smooth = ta.sma(r_period,r_ma)
+plot_ob = plot(r_ob, "Overbought", color.red)
+plot_os = plot(r_os, "Oversold", color.green)
+plot_cl = plot(50, "Center Line", color.gray)
+
+fill(plot_ob,plot_os, color.new(color.blue,90))
+plot(r_period, "RSI Line", color.blue)
+plot(r_smooth, "Smooth RSI", color.aqua)
+//#endregion
+//#region Signals 
+// Condition RSI crossover oversold line(30) and rsi croseover rsi ma (only 1st time)
+crossOS = ta.crossover(r_period,r_os)
+crossOB = ta.crossunder(r_period,r_ob)
+
+crossORMA = ta.crossover(r_period,r_smooth)
+crossURMA = ta.crossunder(r_period,r_smooth)
+
+var sigCrossOS = false
+var sigCrossOB = false
+
+if crossOS
+    sigCrossOS := true
+if crossOB
+    sigCrossOB := true
+
+buySig = isr_sig and sigCrossOS and crossORMA
+sellSig = isr_sig and sigCrossOB and crossURMA
+// plotshape(crossOS ? r_period : na, location = location.absolute, size = size.small)
+// plotshape(crossOB ? r_period : na, location = location.absolute, size = size.small)
+plotshape(buySig  ? r_period : na, "Buy Signnal", shape.labelup, location.absolute, color.green, text = "Buy", textcolor = color.white)
+plotshape(sellSig  ? r_period : na, "Sell Signnal", shape.labeldown, location.absolute, color.red, text = "Sell", textcolor = color.white)
+if crossORMA
+    sigCrossOS := false
+if crossURMA
+    sigCrossOB := false
+
+//#endregion
+// plot(ta.sma(close,10), force_overlay = true)

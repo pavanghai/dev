@@ -1,0 +1,18 @@
+//@version=5
+indicator("A002-1 E Moving Average crossover", "EMAcross", true)
+src = input.source(close, "Source")
+fast_len = input.int(50, "Fast Length")
+slow_len = input.int(100, "Slow Length")
+
+fast_ema = ta.ema(src, fast_len)
+slow_ema = ta.ema(src, slow_len)
+plot(fast_ema, "Fast EMA", color.green, 1)
+plot(slow_ema, "Slow EMA", color.red, 2)
+
+longCondition = ta.crossover(fast_ema, slow_ema)
+shortCondition = ta.crossunder(fast_ema, slow_ema)
+
+plotshape(longCondition, "Buy", shape.labelup, location.belowbar, color.green, text = "Buy", 
+ textcolor = color.white)
+plotshape(shortCondition, "Sell", shape.labeldown, location.abovebar, color.red, text = "Sell", 
+ textcolor = color.white)

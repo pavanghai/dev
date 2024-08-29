@@ -1,0 +1,56 @@
+//@version=5
+indicator("A009 BollingerBands_SuperTrend", "BBST", overlay = true)
+//#region User Input
+// Bollinger Band | SuperTrend switch
+isBB = input.bool(true, "Bollinger Band", "Tick to activate Bollinger Band(Default is ticked)",
+         group = "---Bollinger Band---")
+isST = input.bool(true, "Supertrend", "Tick to activate Supertrend(Default is ticked)", group = "---Super Trend---")
+
+// Bollinger Band
+BB_source = input.source(close, "Source", "select source to calculate Bollinger Bands", group = "---Bollinger Band---")
+BB_length = input.int(20, "Center Line", tooltip = "Center line for calculating Bollinger Bands",
+             group = "---Bollinger Band---")
+BB_stdev = input.int(2, "StdDev", tooltip = "standard deviations from center line to calculate Bollinger Bands",
+             group = "---Bollinger Band---")
+
+// SuperTrend
+ST_factor = input.int(3, "Multiplier", tooltip = "Multiplier factor to be used for Supertrend",
+             group = "---Super Trend---")
+ST_atr = input.int(10, "ATR", tooltip = "ATR to be used to calculate Supertrend", group = "---Super Trend---")
+ST_style = input.string("line", "Style", ["line","circles", "cross"], "Select style to be used for Supertrend",
+             group = "---Super Trend---")
+//#endregion
+//#region Bollinger Band Calculation and ploting 
+[BB_Mid, BB_Up, BB_Dn] = ta.bb(BB_source, BB_length,BB_stdev)
+
+UpBBPlot = plot(isBB ? BB_Up : na, "Upper standard deviations from center line ", color = color.red,
+             editable = false)
+plot(isBB ? BB_Mid : na, "Simple Moving Average - Center line",
+     color = close > ta.sma(BB_source, BB_length) ? color.green : color.red, editable = false)
+DnBBPlot = plot(isBB ? BB_Dn : na, "Lower standard deviations from center line ", color = color.green,
+             editable = false)
+
+BB_fill_color = color.from_gradient(BB_source, BB_Dn, BB_Up, color.red, color.green)
+fill(UpBBPlot, DnBBPlot, color.new(BB_fill_color,90))
+//#endregion
+//#region Bollinger Band Calculation and ploting 
+st_styl = plot.style_linebr
+if ST_style == "line"
+    st_styl := plot.style_linebr
+else if ST_style == "circles"
+    st_styl := plot.style_circles
+else if ST_style == "cross"
+    st_styl := plot.style_cross
+
+[supertrend, direction] = ta.supertrend(ST_factor, ST_atr)
+plot(direction < 0 and isST ? supertrend : na, "Up direction", color = color.green, style=st_styl,
+         editable = false)
+plot(direction > 0 and isST ? supertrend : na, "Down direction", color = color.red, style=st_styl,
+         editable = false)
+//#endregion
+//#region Debugging 
+if direction > 0 and isST // Debugging Direction is 1
+    log.warning(str.tostring(bar_index) + "\nsupertrend on LowerBand: " + str.tostring(supertrend))
+if direction < 0 and isST // Debugging Direction is -1
+    log.info(str.tostring(bar_index) + "\nsupertrend on UpperBand: " + str.tostring(supertrend))
+//#endregion

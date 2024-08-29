@@ -1,0 +1,51 @@
+//@version=5
+indicator("A025 Box with Functions", overlay = true, max_boxes_count = 500, max_bars_back = 500)
+// 1. Upper range high + x %     2. Lower Range low - x %     3. Input for color (Upper and lower range)
+// 4. Extend till last candle    5. N number of session box should display on chart"
+near = input.float(0.25, "Near %", inline = "per") / 100
+far = input.float(1.0, "far %", inline = "per") / 100
+upClr = input.color(color.new(color.red, 70), "High Color", inline = "cr")
+dnClr = input.color(color.new(color.green, 70), "Low Color", inline = "cr")
+numBox = input.int(5, "No of Box Sets: ", inline = "box")
+isExtend = input.bool(false, "Exend to Last", inline = "box")
+
+upFar = high * (1 + far)
+upNear = high * (1 + near)
+dnNear = low * (1 - near)
+dnFar = low * (1 - far)
+upText = "H: " + str.tostring(high) + " T: " + str.tostring(upFar) + " B: " + str.tostring(upNear)
+dnText = "L: " + str.tostring(low) + " T: " + str.tostring(dnNear) + " B: " + str.tostring(dnFar)
+var box upBox = na 
+var box dnBox = na 
+count = ta.barssince(session.isfirstbar)
+
+plot(count, color = color.orange, display = display.status_line)
+plot(session.isfirstbar ? count[1] : na , color = color.maroon, display = display.status_line)
+
+// @function   drawBox  This will create a box
+// @param far  Price point for top 
+// @param near Price point for bottom 
+// @param clr  Fill color
+// @param txt  Text in Box
+// @returns    Box ID
+drawBox(float far, float near, color clr, string txt, hist) =>
+    // label.new(bar_index,high, str.tostring(count[1]) + " - " + str.tostring(hist), style = label.style_label_down, color = color.yellow)
+    BOX = box.new(left=bar_index, top=far, right=bar_index+hist, bottom=near, 
+     bgcolor = clr, text = txt, text_halign =  text.align_left)
+    box.delete(BOX[hist*numBox])
+    BOX
+
+if session.isfirstbar
+    hist = count[1]+1
+    upBox := drawBox(far = upFar, near =  upNear, clr = upClr, txt = upText, hist = hist)
+    dnBox := drawBox(far = dnNear, near =  dnFar, clr = dnClr, txt = dnText, hist = hist)
+else
+    if not isExtend
+        // label.new(bar_index,high, str.tostring(count[1]), style = label.style_label_down, color = color.yellow)
+        upBox.set_right(bar_index)
+        dnBox.set_right(bar_index)
+
+// if barstate.islast
+//     label.new(bar_index,high, str.tostring(count[1]), style = label.style_label_down, color = color.yellow)
+// if session.islastbar
+//     label.new(bar_index,high, str.tostring(count[1]), style = label.style_label_down, color = color.yellow)

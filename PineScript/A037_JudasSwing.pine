@@ -1,0 +1,75 @@
+//@version=5
+indicator("A037 Judas Swing", overlay = true)
+
+near = input.float(0.1, "Near Mult")/100
+far = input.float(0.5, "Far Mult")/100
+
+type Range
+    box channel
+    line entry
+    bool valid
+
+var uprBox = array.new<Range>()
+var dnrBox = array.new<Range>()
+
+if session.isfirstbar
+    upBox = box.new(bar_index, high+high*far, bar_index, high+high*near, bgcolor = color.orange)
+    upEnt = line.new(bar_index, high, bar_index, high, color=color.orange)
+    
+    dnBox = box.new(bar_index, low-low*near, bar_index, low-low*far, bgcolor = color.aqua)
+    dnEnt = line.new(bar_index, low, bar_index, low, color=color.aqua)
+
+    uprBox.push(Range.new(upBox, upEnt, false))
+    dnrBox.push(Range.new(dnBox, dnEnt, false))
+
+// plot(close, title = "CLOSE")
+
+if uprBox.size() > 3
+    uprBox.shift()
+if dnrBox.size() > 3
+    dnrBox.shift()
+
+
+for [index,item] in uprBox
+    item.channel.set_right(bar_index)
+    item.entry.set_x2(bar_index)
+
+    if close > item.channel.get_bottom()
+        item.valid := true
+    if high > item.channel.get_top()
+        item.valid := false
+        uprBox.remove(index)
+        label.new(bar_index, item.channel.get_top(), str.tostring(item.valid))
+
+    if item.valid
+        price = item.entry.get_y1()
+        if close < price
+            label.new(bar_index, price, "Short")
+            uprBox.remove(index)
+
+    log.warning(str.tostring(item.valid) + str.tostring(item.channel.get_left()))
+
+for [index,item] in dnrBox
+    item.channel.set_right(bar_index)
+    item.entry.set_x2(bar_index)
+
+    if close < item.channel.get_top()
+        item.valid := true
+    if low < item.channel.get_bottom()
+        item.valid := false
+        dnrBox.remove(index)
+        label.new(bar_index, item.channel.get_bottom(), str.tostring(item.valid))
+
+    if item.valid
+        price = item.entry.get_y1()
+        if close > price
+            label.new(bar_index, price, "long",style = label.style_label_lower_left)
+            dnrBox.remove(index)
+
+    log.warning(str.tostring(item.valid) + str.tostring(item.channel.get_left()))
+
+plot(bar_index, display = display.status_line)
+
+if barstate.islast
+    log.warning(str.tostring(uprBox.size()))
+//TODO: WATCH VIDEO AND REDO ALL

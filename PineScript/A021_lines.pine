@@ -1,0 +1,83 @@
+//@version=5
+indicator("A021 lines", overlay = true, max_lines_count = 120)
+//#region input parameters and arguments
+msGrp = "Moving Average"
+isMa = input.bool(true, "sma ON|OFF", inline = "maS", group = msGrp)
+maTyp = input.string("SMA", "Type", ["SMA","EMA","WMA","VWMA","HMA"], inline = "maS", group = msGrp)
+isCross = input.bool(false, "plot 'X' for MA Cross", inline = "maS", group = msGrp)
+maSrc = input.source(close, "Source", inline = "ma", group = msGrp)
+maFast = input.int(50, "Fast", inline = "ma", group = msGrp)
+maSlow = input.int(100, "Slow", inline = "ma", group = msGrp)
+
+setGrp = "STOP ENTRY TARGET (SET)"
+perPtTT = "tick to calculation in points and untick for percent | Stop is points or Percent away from Entry"
+     +" | target is multiplier number based on Entry Price in relation to STOP Price"
+isLine = input.bool(true, "Draw SET Lines", inline = "LPP", group = setGrp)
+isPt = input.bool(false, "Points ON | Percent OFF", perPtTT, "LPP", setGrp)
+tgt2 = input.bool(false, "2ndTarget", perPtTT, "LPP", setGrp)
+stop = input.float(1.0, "Stop", inline = "perPt", group = setGrp)
+entry = input.source(close, "Entry", inline = "perPt", group = setGrp)
+target = input.float(2, "target", inline = "perPt", group = setGrp)
+//#endregion
+//#region switch for moving average with plotting 
+float fastMA = switch maTyp
+    "SMA"  => ta.sma(maSrc, maFast)
+    "EMA"  => ta.ema(maSrc, maFast)
+    "WMA"  => ta.wma(maSrc, maFast)
+    "VWMA" => ta.vwma(maSrc, maFast)
+    "HMA"  => ta.hma(maSrc, maFast)
+float slowMA = switch maTyp
+    "SMA"  => ta.sma(maSrc, maSlow)
+    "EMA"  => ta.ema(maSrc, maSlow)
+    "WMA"  => ta.wma(maSrc, maSlow)
+    "VWMA" => ta.vwma(maSrc, maSlow)
+    "HMA"  => ta.hma(maSrc, maSlow)
+
+plot(isMa ? fastMA : na, "Fast MA", color.lime)
+plot(isMa ? slowMA : na, "Slow MA", color.orange)
+//#endregion
+//#region MA cross and plot Shape
+long = ta.crossover(fastMA, slowMA)
+short = ta.crossunder(fastMA, slowMA)
+
+plotshape(isCross ? long : na, "Long", color =  color.lime, size = size.small, display = display.pane)
+plotshape(isCross ? short : na, "Short", color = color.orange, size = size.small, display = display.pane)
+//#endregion
+//#region SET Lines logic
+if isLine
+    slVal = isPt ? stop : entry * (stop/100)
+    tgtVal = slVal * target
+    var line entryLine = na
+    var line stopLine = na
+    var line targetLine = na
+    var line targetLine2 = na
+    if long or short
+        entryLine := line.new(bar_index, entry, bar_index, entry, color = color.blue, width = 2)
+        if long
+            y_sl = entry - slVal
+            y_tgt = entry + (slVal * target)
+            y_tgt2 = entry + (slVal * target * 2)
+            log.warning("\nEntry: " + str.tostring(entry) 
+                 + "\nRisk: " + str.tostring(slVal) + " Reward: " + str.tostring(slVal * target)
+                 + "\nStop: " + str.tostring(y_sl) + "\Target: " + str.tostring(y_tgt))
+            stopLine := line.new(bar_index, y_sl, bar_index + 5, y_sl, color = color.red, width = 3)
+            targetLine := line.new(bar_index,y_tgt, bar_index + 5, y_tgt, color = color.green, width = 3)
+            if tgt2
+                targetLine2 := line.new(bar_index,y_tgt2, bar_index + 5, y_tgt2, color = color.olive, width = 3)
+        if short
+            y_sl = entry + slVal
+            y_tgt = entry - (slVal * target)
+            y_tgt2 = entry - (slVal * target * 2)
+            log.info("\nEntry: " + str.tostring(entry) 
+                 + "\nRisk: " + str.tostring(slVal) + " Reward: " + str.tostring(slVal * target)
+                 + "\nStop: " + str.tostring(y_sl) + "\Target: " + str.tostring(y_tgt))
+            stopLine := line.new(bar_index, y_sl, bar_index + 5, y_sl, color = color.red, width = 3)
+            targetLine := line.new(bar_index,y_tgt, bar_index + 5, y_tgt, color = color.green, width = 3)
+            if tgt2
+                targetLine2 := line.new(bar_index,y_tgt2, bar_index + 5, y_tgt2, color = color.olive, width = 3)
+    else
+        stopLine.set_x2(bar_index)
+        entryLine.set_x2(bar_index)
+        targetLine.set_x2(bar_index)
+        targetLine2.set_x2(bar_index)
+//#endregion

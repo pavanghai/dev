@@ -1,0 +1,22 @@
+//@version=5
+indicator("A005 Open Range Breakout", "ORB", true)
+//#region Requirements
+// Buy sell signal after breakout of session first bar, 
+// user input: selection of source to be breakout 
+//#endregion
+b_src = input.source(close, "Source Buy", inline = "src")
+s_src = input.source(close, "Sell", inline = "src", tooltip = "Provide source for buy and sell")
+var float High = na
+var float Low = na
+if session.isfirstbar
+    High := high
+    Low := low
+boBuy = ta.crossover(b_src, High)
+boSell = ta.crossunder(s_src, Low)
+
+plot(High, color = color.red)
+plot(Low, color = color.green)
+plotshape(boBuy, "Breakout Buy", shape.labelup, location = location.belowbar, color = color.green,
+ text = "Buy", textcolor = color.white, editable = false)
+plotshape(boSell, "Breakout Sell", shape.labeldown, location = location.abovebar, color = color.red, 
+ text = "Sell", textcolor = color.white, editable = false)

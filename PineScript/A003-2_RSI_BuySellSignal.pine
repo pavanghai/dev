@@ -1,0 +1,37 @@
+//@version=5
+indicator("A003-2 BuySell on RSI Signal", "BS_RSI_S", overlay = false)
+
+//#region Input section
+rsi_on = input.source(close, "RSI_on ?:", "Plot RSI on close, open, high, etc", group = "RSI")
+rsi_line = input.int(14, "RSI Value", tooltip = "Enter value for over bought", group = "RSI")
+over_bought_line = input.int(75, "RSI OverBought", [55,60,65,70,75,80,90,95],
+                     tooltip = "Enter value for over bought", group = "RSI")
+over_sold_line = input.int(25, "RSI OverSold", [10,20,25,30,35,40, 45],
+                     tooltip = "Enter value for over sold", group = "RSI")
+
+ma_ = ta.ema(rsi_on, input.int(8, "EMA: ", minval = 5, maxval = 26, step = 1,
+                         tooltip = "Select value of EMA to generate buy and sell signal on RSI",
+                          group = "RSI_signal" )) 
+//#endregion
+//#region hline details 
+line_0 = hline(0)
+line_100 = hline(100)
+line_high = hline(over_bought_line, "Over Bought line", color.red, hline.style_dashed, 2)
+line_low = hline(over_sold_line, "Over Sold line", color.green, hline.style_dashed, 2)
+
+fill(line_high, line_100, color.rgb(255,82,82, transp = 80), "Over Bought Zone")
+fill(line_low, line_0, color.rgb(76,175,80, transp = 80), "Over Bought Zone") 
+//#endregion
+rsi_ = ta.rsi(rsi_on, rsi_line)
+//#region bullish/bearish Signal logic
+bullish_signal = rsi_on > ma_ and rsi_ < over_sold_line
+bearish_signal = rsi_on < ma_ and rsi_ > over_bought_line
+//#endregion
+//#region Chart ploting 
+plot(rsi_, "RSI moving Average", color.blue)
+plotshape(bullish_signal ? rsi_-3 : na, "bullish signal", shape.triangleup, location.absolute,
+         color.green, text = "Buy", size = size.small)
+plotshape(bearish_signal ? rsi_+3 : na, "bearish signal", shape.triangledown, location.absolute,
+         color.red, text = "sell", size = size.small)
+//#endregion
+log.info(str.tostring(bar_index) + " Signal " + str.tostring(bullish_signal)) //TODO: get bar_index only for signals
