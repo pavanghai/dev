@@ -1,0 +1,21 @@
+//@version=5
+indicator("B004-1 Comparison and ternary operator", "cto", true)
+fastSma = ta.sma(close, 50)
+slowSma = ta.sma(close, 100)
+plot(fastSma, color = color.lime)
+plot(slowSma, color = color.red)
+
+rsi = ta.rsi(close, 14)
+rsiMA = ta.sma(rsi, 14)
+
+//Background color to green or red based on moving average cross over and rsi crossing rsiMA
+bullishArea = (fastSma > slowSma) and (rsi > rsiMA)
+bearishArea = (fastSma < slowSma) and (rsi < rsiMA)
+// //Background color to green or red based on moving average cross over or rsi crossing rsiMA
+// bullishArea = (fastSma > slowSma) or (rsi > rsiMA)
+// bearishArea = (fastSma < slowSma) or (rsi < rsiMA)
+
+// bgColor = not bullishArea ? color.new(color.green, 90) : color.new(color.red, 90) //Testing opposite case
+bgColor = bullishArea ? color.new(color.green, 90) : color.new(color.red, 90)
+bgcolor(bgColor)
+//NOTES: Add RSI indicator to check how it is working on chart 

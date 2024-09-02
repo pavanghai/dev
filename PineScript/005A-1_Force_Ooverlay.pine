@@ -1,0 +1,13 @@
+//@version=5
+indicator("B005-1 force_overlay")
+rsi = ta.rsi(close, 14)
+
+plot(rsi, color = color.orange)
+plot(50)
+
+sma = ta.sma(close, 50)
+
+plot(sma, force_overlay = true)
+long = close > sma and rsi > 50
+// plotshape(long ? rsi : na, location = location.absolute)
+plotshape(long, force_overlay = true) //on Chart

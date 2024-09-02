@@ -1,0 +1,29 @@
+//@version=5
+indicator("B003 arithmetic-operators", overlay = true)
+
+// Addition and subtraction
+// plot(close + 10) 
+// plot(close)
+// plot(close - 10)
+
+//Multiplication and division
+plot(close * 1.1)
+plot(close)
+plot(close / 1.1)
+
+sma = ta.sma(close, 50)
+plot(sma, color = color.red)
+bullish = close > sma
+
+plotshape(bullish, text = "Buy")
+log.info("Testing close: " + str.tostring(close))
+log.warning("warning" +  str.tostring(50.0 + 50))
+log.error("error" + str.tostring(100))
+
+// log.info("REMAINDER: " + str.tostring(50%6)) //message(series string)
+// log.warning("Even: " + str.tostring(30%2)) //message(series string)
+// log.warning("Odd: " + str.tostring(35%2)) //message(series string)
+
+log.info("Bar Index: " + str.tostring(bar_index)) //message(series string)
+log.warning("Even: " + str.tostring(bar_index % 2 == 0)) //message(series string)
+log.warning("Odd: " + str.tostring(bar_index % 2 != 0)) //message(series string)

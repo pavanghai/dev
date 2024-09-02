@@ -1,0 +1,15 @@
+//@version=5
+indicator("B004-2 History Referencing operator", "HRO", true)
+
+sma = ta.sma(close, 50)
+// can use close[0] or close for current candle(last candle)
+bullDay = close > close[1]
+bullishEngulf = close > open and close[1] < open[1] and close > open[1] and open < close[1]
+
+// plot(close[1], color=color.orange)
+// plot(high, color=color.green)
+plot(sma, color = color.green)
+
+// plotshape(bullDay, style = shape.triangledown)
+// plotshape(bullishEngulf, style = shape.triangledown)
+plotshape(bullishEngulf and close < sma, style = shape.triangledown) //Location of bullishEngulf

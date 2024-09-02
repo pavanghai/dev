@@ -1,0 +1,9 @@
+//@version=5
+indicator("B001 case-sensitive", overlay = true)
+fast_sma = ta.sma(close, 50)
+slow_sma = ta.sma(length = 100, source = close)
+
+longCondition = ta.crossover(fast_sma, slow_sma)
+plot(fast_sma)
+plot(slow_sma)
+plotshape(longCondition)
