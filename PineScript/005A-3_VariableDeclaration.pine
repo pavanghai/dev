@@ -1,0 +1,52 @@
+//@version=5
+indicator("B005-3 Variable declarations","VariableDec", overlay = true)
+// Assignment-1 : OpenRangeBreakout based on high and low 
+// All possible dynamic inputs
+// Create Long signal if price breaks session's first candle high
+// Create Short signal if price breaks session's first candle Low
+// Create StopLoss of 10% if signal Generated below same candle's Low or High +- 10%
+// Conditions: 1. only 1st signal unless StopLoss is hit
+
+// Assignment-2 : OpenRangeBreakout based on RSI and RSI-SMA
+// All possible dynamic inputs
+// Create Long signal if RSI crossing RSISMA only 1 time Eg: rsi came down and crossed RSISMA only 1 time only then 
+
+var float High = na
+var float Low = na
+
+if session.isfirstbar
+    High := high
+    Low := low
+
+plot(High, color = color.green, style = plot.style_linebr)
+plot(Low, color = color.red)
+plotshape(session.isfirstbar, color = color.orange,size = size.small, style = shape.square)
+long = ta.crossover(close, High)
+short = ta.crossunder(close, Low)
+
+var sl = float(na)
+
+if long
+    sl := low / 1.2
+
+var validRange = true
+
+var isSL = false
+
+if ta.crossunder(close, sl)
+    isSL := true
+
+if session.islastbar
+    isSL := true
+
+
+// if
+//     validRange := false
+    
+plotshape(isSL and not isSL[1], color = color.red, size = size.normal)
+plotshape(long and isSL, location = location.belowbar, style = shape.arrowup, color = color.green,size = size.normal)
+plotshape(sl, color = color.black,size = size.small)
+if long
+    isSL := false
+
+plotshape(short, location = location.abovebar, style = shape.arrowdown, color = color.red,size = size.normal)

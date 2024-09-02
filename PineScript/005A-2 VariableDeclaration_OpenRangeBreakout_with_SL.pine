@@ -1,0 +1,40 @@
+//@version=5
+indicator("B005-2 Variable declaration Open Range breakout with SL", overlay = true)
+
+// High = 0.0 //reset to zero on next bar
+// float High = na // connects high of next sessions first bar 
+var float High = na //with var keyword it will continue till last bar and than connects with next first bar
+var float Low = na
+
+if session.isfirstbar
+    High := high
+    Low := low
+
+// plot(High)
+plot(High, style = plot.style_linebr, color = color.red) // line break after ploting notice dash on candle first bar  
+plot(Low, style = plot.style_linebr, color = color.green) 
+plotshape(session.isfirstbar,color = color.black) // Shap on sessions first candle, timeframe less than daily
+long = ta.crossover(close, High)
+short = ta.crossunder(close, Low)
+
+var sl = 0.0
+if long
+    sl := low - 0.25 // (low * 0.01) 
+
+var validRange = true
+
+var isSL = false
+
+if ta.crossunder(close,sl)
+    isSL := true
+if session.islastbar
+    isSL := true
+
+plotshape(isSL and not isSL[1], color = color.red, size = size.large)
+plotshape(long and isSL , location = location.belowbar, style = shape.arrowup, color = color.green)
+
+if long
+    isSL := false
+
+plotshape(short, style = shape.arrowdown, color = color.red)
+plot(sl, color = color.maroon)
