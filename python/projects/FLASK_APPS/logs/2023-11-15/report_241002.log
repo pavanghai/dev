@@ -1,0 +1,36 @@
+20241002 21:18:42 - Log started for student with ID: 16 and JOINING_DATE: 2023-11-15
+20241002 21:18:42 - Executing Flask commands
+20241002 21:18:42 - Executing:
+20241002 21:18:42 -     'flask list'
+20241002 21:18:42 - Executed 'flask list' successfully
+20241002 21:18:42 - Executing:
+20241002 21:18:42 -     'flask delete 13'
+20241002 21:18:42 - Executed 'flask delete 13' successfully
+20241002 21:18:42 - Executing:
+20241002 21:18:42 -     'flask list'
+20241002 21:18:42 - Executed 'flask list' successfully
+20241002 21:18:42 - Script completed successfully.
+20241002 21:33:13 - Log started for student with ID: 16 and JOINING_DATE: 2023-11-15
+20241002 21:33:13 - Executing Flask commands
+20241002 21:33:13 - Executing:
+20241002 21:33:13 -     'flask list'
+20241002 21:33:13 - Executed 'flask list' successfully
+20241002 21:33:13 - Executing:
+20241002 21:33:13 -     'flask delete 6'
+20241002 21:33:13 - Executed 'flask delete 6' successfully
+20241002 21:33:13 - Executing:
+20241002 21:33:13 -     'flask list'
+20241002 21:33:13 - Executed 'flask list' successfully
+20241002 21:33:13 - Script completed successfully.
+20241002 21:34:11 - Log started for student with ID: 16 and JOINING_DATE: 2023-11-15
+20241002 21:34:11 - Executing Flask commands
+20241002 21:34:11 - Executing:
+20241002 21:34:11 -     'flask list'
+20241002 21:34:11 - Executed 'flask list' successfully
+20241002 21:34:11 - Executing:
+20241002 21:34:11 -     'flask delete 6'
+20241002 21:34:11 - Executed 'flask delete 6' successfully
+20241002 21:34:11 - Executing:
+20241002 21:34:11 -     'flask list'
+20241002 21:34:11 - Executed 'flask list' successfully
+20241002 21:34:11 - Script completed successfully.
