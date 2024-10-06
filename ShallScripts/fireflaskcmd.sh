@@ -48,7 +48,7 @@ execute_command() {
 query="SELECT rowid, JOINING_DATE FROM stu WHERE JOINING_DATE <= '$CURRENT_DATE' ORDER BY JOINING_DATE DESC LIMIT 1;"
 read stuID stuJDT < <(/c/sqlite/sqlite3 -separator ' ' "${DB_PATH}" "${query}")
 
-echo "ID: $stuID" "JDT: $stuJDT"
+echo "ID: $stuID" "JDT: $stuJDT" 
 
 # Create log directory if it doesn't exist
 mkdir -p "$LOG_DIR/$stuJDT" || handle_error "Failed to create log directory"
