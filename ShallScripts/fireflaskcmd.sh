@@ -40,10 +40,15 @@ execute_command() {
 # stuJDT=$( /c/sqlite/sqlite3 "$DB_PATH" "SELECT JOINING_DATE FROM stu WHERE rowid=$stuID;" ) || handle_error "Failed to get student JOINING_DATE"
 # # Step 1: Get ID and JOINING_DATE from the database
 # read stuID stuJDT < <( /c/sqlite/sqlite3 "$DB_PATH" "SELECT rowid, JOINING_DATE FROM stu WHERE JOINING_DATE <= '$CURRENT_DATE' ORDER BY JOINING_DATE DESC LIMIT 1;" ) || handle_error "Failed to get student ID and JOINING_DATE"
-result=$( /c/sqlite/sqlite3 "$DB_PATH" "SELECT rowid, JOINING_DATE FROM stu WHERE JOINING_DATE <= '$CURRENT_DATE' ORDER BY JOINING_DATE DESC LIMIT 1;" ) || handle_error "Failed to get student ID and JOINING_DATE"
+# result=$( /c/sqlite/sqlite3 "$DB_PATH" "SELECT rowid, JOINING_DATE FROM stu WHERE JOINING_DATE <= '$CURRENT_DATE' ORDER BY JOINING_DATE DESC LIMIT 1;" ) || handle_error "Failed to get student ID and JOINING_DATE"
 
-Read stuID and stuJDT from the result
-read stuID stuJDT <<< "$result"
+# Read stuID and stuJDT from the result
+# read stuID stuJDT <<< "$result"
+
+query="SELECT rowid, JOINING_DATE FROM stu WHERE JOINING_DATE <= '$CURRENT_DATE' ORDER BY JOINING_DATE DESC LIMIT 1;"
+read stuID stuJDT < <(/c/sqlite/sqlite3 -separator ' ' "${DB_PATH}" "${query}")
+
+echo "ID: $stuID" "JDT: $stuJDT"
 
 # Create log directory if it doesn't exist
 mkdir -p "$LOG_DIR/$stuJDT" || handle_error "Failed to create log directory"
