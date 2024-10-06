@@ -1,0 +1,12 @@
+20241005 19:40:30 - Log started for student with ID: 16 and JOINING_DATE: 2023-11-15
+20241005 19:40:30 - Executing Flask commands
+20241005 19:40:30 - Executing:
+20241005 19:40:30 -     'flask list'
+20241005 19:40:30 - Executed 'flask list' successfully
+20241005 19:40:30 - Executing:
+20241005 19:40:30 -     'flask delete 6'
+20241005 19:40:30 - Executed 'flask delete 6' successfully
+20241005 19:40:30 - Executing:
+20241005 19:40:30 -     'flask list'
+20241005 19:40:30 - Executed 'flask list' successfully
+20241005 19:40:30 - Script completed successfully.
