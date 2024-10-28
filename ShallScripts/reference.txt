@@ -1,0 +1,19 @@
+Execute shell script
+  ./<filename>
+  bash <path/filename>
+
+Comments
+  Single line use # 
+    # use of hash sign belfore the start of line to comment it, can be in line too 
+  Multiline 
+    Colons and single quotes. 
+      : '
+      Any thing you add in this  block will be commented 
+      next line that is commented 
+      '
+    EOF
+      <<-EOF
+      This is a 
+      multi-line 
+      comment
+      EOF
